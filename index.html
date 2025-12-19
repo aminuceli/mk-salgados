@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MK Salgados | Cardápio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Open+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --primary: #FF8C00; 
+            --primary-dark: #e67e00;
+            --dark: #111111;
+            --bg: #fffbf2;
+            --white: #ffffff;
+            --success: #27ae60; 
+            --wa-color: #25D366;
+            --header-height: 85px; 
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Open Sans', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg); 
+            color: #333;
+            overflow-x: clip; 
+        }
+        
+        body {
+            display: block;
+            padding-top: var(--header-height); 
+        }
+
+        /* --- HEADER --- */
+        header { 
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background-color: var(--dark); display: flex; justify-content: space-between; align-items: center;
+            padding: 0 15px; z-index: 2000; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .brand-logo { display: flex; align-items: center; gap: 12px; max-width: 80%; }
+        .brand-text { display: flex; flex-direction: column; justify-content: center; }
+        .logo-top-row { display: flex; align-items: baseline; gap: 6px; line-height: 1; margin-bottom: 2px; }
+        .mk-text { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: var(--primary); text-shadow: 2px 2px 0px #000; }
+        .salgados-text { font-size: 0.7rem; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 2px; }
+        .header-address { font-size: 0.65rem; color: #ccc; font-weight: 400; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+        .header-hours { font-size: 0.7rem; color: #f1c40f; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+        .header-address i { color: var(--primary); font-size: 0.7rem; }
+
+        .cart-btn-header { position: relative; background: rgba(255,255,255,0.1); color: var(--primary); padding: 10px; border-radius: 12px; cursor: pointer; border: 1px solid var(--primary); transition: 0.2s; flex-shrink: 0; }
+        .cart-btn-header:active { transform: scale(0.95); }
+        .cart-count { position: absolute; top: -8px; right: -8px; background-color: var(--primary); color: var(--dark); border-radius: 50%; width: 22px; height: 22px; font-size: 0.75rem; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid var(--dark); }
+
+        /* --- HERO --- */
+        .hero { text-align: center; padding: 40px 20px; background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1590787902575-46309503114e?q=80&w=1000&auto=format&fit=crop'); background-size: cover; background-position: center; color: white; position: relative; z-index: 1; }
+        .hero h1 { font-family: 'Fredoka One', cursive; font-size: 2rem; margin-bottom: 5px; color: var(--primary); text-shadow: 2px 2px 0px #000; }
+        .hero p { font-size: 1.1rem; opacity: 1; font-weight: 600; text-shadow: 1px 1px 2px black; font-style: italic; }
+        
+        /* --- CATEGORIES --- */
+        .categories-wrapper { background: var(--dark); padding: 15px 0; position: sticky; top: var(--header-height); z-index: 1900; box-shadow: 0 5px 10px rgba(0,0,0,0.2); margin-top: -1px; }
+        .categories { display: flex; gap: 10px; padding: 0 15px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+        .categories::-webkit-scrollbar { display: none; }
+        .cat-btn { background: transparent; border: 2px solid #444; padding: 8px 20px; border-radius: 50px; cursor: pointer; font-weight: 700; color: #ccc; font-size: 0.9rem; transition: 0.3s; flex-shrink: 0; }
+        .cat-btn.active { background: var(--primary); color: var(--dark); border-color: var(--primary); transform: scale(1.05); box-shadow: 0 0 10px rgba(255, 140, 0, 0.5); }
+
+        /* --- CONTENT --- */
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px 15px 80px 15px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        .product-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; border: 1px solid #fae1c5; }
+        .product-img { height: 140px; background-color: #fff3e0; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #ffcc80; position: relative; cursor: pointer; }
+        .product-img img { width: 100%; height: 100%; object-fit: cover; }
+        .cat-tag { position: absolute; top: 8px; left: 8px; background: var(--dark); color: var(--primary); padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
+        .product-info { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; }
+        .product-title { font-weight: 800; font-size: 1rem; margin-bottom: 5px; color: var(--dark); line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 38px; cursor: pointer; }
+        .product-desc { color: #666; font-size: 0.75rem; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 30px; }
+        .product-price { color: var(--primary-dark); font-weight: 900; font-size: 1.1rem; margin-bottom: 12px; }
+
+        .button-group { display: flex; gap: 8px; margin-top: auto; }
+        .btn-info { width: 42px; height: 42px; border-radius: 10px; border: 2px solid var(--dark); background: white; color: var(--dark); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; flex-shrink: 0; transition: 0.2s; }
+        .btn-add { flex-grow: 1; height: 42px; border-radius: 10px; background: var(--primary); color: var(--dark); border: none; font-weight: 800; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 4px 0 #cc7000; transition: 0.1s; }
+        .btn-add:active { transform: translateY(4px); box-shadow: none; }
+
+        /* --- FLOATING & SIDEBAR --- */
+        .floating-wa { position: fixed; bottom: 25px; left: 20px; background-color: var(--wa-color); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 2900; transition: transform 0.3s; text-decoration: none; }
+        .cart-sidebar { position: fixed; top: 0; right: -100%; width: 100%; max-width: 350px; height: 100%; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.5); padding: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 3000; display: flex; flex-direction: column; }
+        .cart-sidebar.active { right: 0; }
+        .cart-header-bg { background: var(--dark); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary); }
+        .cart-header-bg h3 { font-family: 'Fredoka One', cursive; font-size: 1.4rem; letter-spacing: 1px; color: var(--primary); }
+        .cart-items { flex-grow: 1; overflow-y: auto; padding: 20px; background: #fffbf2; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e0d0b0; padding-bottom: 15px; }
+        .cart-footer { padding: 20px; background: white; border-top: 1px solid #eee; }
+        
+        /* BOTÃO CONTINUAR COMPRANDO - ADICIONADO AQUI */
+        .btn-keep-buying { width: 100%; padding: 12px; margin-bottom: 10px; background: transparent; border: 2px solid #ccc; color: #666; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.95rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-keep-buying:hover { background: #f5f5f5; border-color: #bbb; }
+        .btn-keep-buying:active { transform: scale(0.98); }
+
+        .btn-checkout { width: 100%; padding: 16px; background: var(--dark); color: var(--primary); border: none; border-radius: 12px; cursor: pointer; font-size: 1.1rem; font-weight: 900; box-shadow: 0 5px 15px rgba(0,0,0,0.2); text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* --- MODALS --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 4000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-content-product { background: #fff; width: 95%; max-width: 550px; border-radius: 20px; padding: 0; max-height: 85vh; display: flex; flex-direction: column; animation: popIn 0.3s; position: relative; overflow: hidden; border: 2px solid var(--primary); }
+        .modal-body-scroll { overflow-y: auto; padding: 25px; flex-grow: 1; background: #fffbf2; }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .close-modal-round { position: absolute; top: 15px; right: 15px; background: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 10; color: var(--primary); border: 2px solid var(--primary); }
+        .prod-modal-img { width: 100%; height: 300px; background: #fff3e0; display: flex; align-items: center; justify-content: center; font-size: 4rem; color: #ffcc80; flex-shrink: 0; }
+        .prod-modal-img img { width: 100%; height: 100%; object-fit: cover; }
+        .prod-modal-title { font-size: 1.8rem; font-weight: 900; color: var(--dark); margin-bottom: 15px; line-height: 1.1; font-family: 'Fredoka One', cursive; }
+        .prod-modal-desc { font-size: 1.05rem; color: #444; line-height: 1.7; white-space: pre-wrap; word-wrap: break-word; margin-bottom: 20px; }
+        .modal-product-footer { padding: 20px; border-top: 1px solid #ddd; background: white; }
+        
+        .modal-content-checkout { background: #fff; width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; padding: 30px; max-height: 92vh; overflow-y: auto; align-self: flex-end; animation: slideUp 0.3s; border-top: 5px solid var(--primary); z-index: 4001;}
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: flex; align-items: center; gap: 8px; font-weight: 800; margin-bottom: 8px; font-size: 0.95rem; color: var(--dark); }
+        .form-control { width: 100%; padding: 16px; border: 2px solid #eee; border-radius: 12px; font-size: 1rem; outline: none; background: #f9f9f9; transition: 0.3s; font-family: inherit; }
+        .form-control:focus { border-color: var(--primary); background: white; }
+        .input-row { display: flex; gap: 12px; }
+        .receipt-preview { background: #fffbea; padding: 25px; border: 3px dashed var(--dark); font-family: 'Courier New', monospace; font-size: 0.9rem; color: #333; margin-bottom: 25px; display: none; border-radius: 15px; }
+        
+        .btn-action { width: 100%; padding: 18px; border-radius: 12px; font-weight: 900; border: none; font-size: 1.1rem; cursor: pointer; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
+        .btn-whatsapp { background: var(--wa-color); color: white; }
+        .btn-receipt { background: #333; color: white; }
+        
+        .btn-search { background: var(--dark); color: var(--primary); border: none; border-radius: 12px; padding: 0 25px; cursor: pointer; font-weight: bold; font-size: 1.2rem; }
+        .address-list { list-style: none; margin-top: 10px; border: 1px solid #eee; border-radius: 10px; overflow: hidden; display: none; }
+        .address-list li { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; background: white; font-size: 0.9rem; transition: 0.2s; }
+        .address-list li:hover { background: #f0f0f0; color: var(--primary-dark); }
+
+        .pix-area { background: #edfff3; padding: 20px; border-radius: 15px; border: 2px solid #c8e6c9; display: none; margin-bottom: 20px; text-align: center; }
+        .loading-container { padding: 60px; text-align:center; color:#999; }
+        .error-card { text-align: center; padding: 40px 20px; background: white; border-radius: 15px; border: 2px solid #ffcccb; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+        .prefs-box { background: #fff8e1; border: 1px solid #ffe0b2; border-radius: 10px; padding: 15px; margin-bottom: 20px; }
+        .prefs-title { color: var(--primary-dark); font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+        .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .check-label { display: flex; align-items: center; gap: 5px; font-size: 0.9rem; cursor: pointer; }
+        .check-label input { accent-color: var(--primary); width: 18px; height: 18px; }
+
+        .delivery-toggle { display: flex; background: #eee; padding: 5px; border-radius: 12px; margin-bottom: 25px; }
+        .delivery-toggle label { flex: 1; text-align: center; padding: 12px; cursor: pointer; border-radius: 10px; font-weight: 800; transition: 0.3s; margin: 0; color: #777; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .delivery-toggle input { display: none; }
+        .delivery-toggle input:checked + span { background: white; color: var(--dark); box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 100%; display: block; padding: 12px; border-radius: 8px; border: 2px solid var(--primary); color: var(--primary); }
+        .mode-option { width: 100%; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-logo">
+            <div class="logo-icon" style="font-size: 1.8rem; color: var(--primary);"><i class="fas fa-utensils"></i></div>
+            <div class="brand-text">
+                <div class="logo-top-row"><span class="mk-text">MK</span><span class="salgados-text">Salgados</span></div>
+                <span class="header-address"><i class="fas fa-map-marker-alt"></i> R. Cambuci, 67 - Jd. Paulista II</span>
+                <span class="header-hours"><i class="far fa-clock"></i> Seg-Sáb: 09h-22h | Dom: até 18h (07h-09h só agendado)</span>
+            </div>
+        </div>
+        <div class="cart-btn-header" onclick="toggleCart()">
+            <i class="fas fa-shopping-bag"></i>
+            <span class="cart-count" id="cartCount">0</span>
+        </div>
+    </header>
+
+    <div class="hero">
+        <h1>Mais amor e mais salgados, por favor!</h1>
+        <p>Os melhores salgados de Indaiatuba.</p>
+    </div>
+
+    <div class="categories-wrapper">
+        <div class="categories">
+            <button class="cat-btn active" onclick="filterCategory('todos', this)">Todos</button>
+            <button class="cat-btn" onclick="filterCategory('combo', this)">Combos</button>
+            <button class="cat-btn" onclick="filterCategory('salgados', this)">Salgados</button>
+            <button class="cat-btn" onclick="filterCategory('doces', this)">Doces</button>
+            <button class="cat-btn" onclick="filterCategory('bebidas', this)">Bebidas</button>
+            <button class="cat-btn" onclick="filterCategory('monte seu combo', this)">Monte Combo</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="products-grid" id="productsGrid">
+            <div class="loading-container">
+                <i class="fas fa-circle-notch fa-spin fa-3x" style="color:var(--primary); margin-bottom: 20px;"></i>
+                <h3 style="font-weight:800; color:var(--dark);">Preparando cardápio...</h3>
+            </div>
+        </div>
+    </div>
+
+    <a href="https://wa.me/5519994990025" target="_blank" class="floating-wa" aria-label="Falar no WhatsApp"><i class="fab fa-whatsapp"></i></a>
+
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header-bg"><h3>SEU PEDIDO</h3><i class="fas fa-times" style="font-size: 1.5rem; cursor: pointer;" onclick="toggleCart()"></i></div>
+        <div class="cart-items" id="cartItems"></div>
+        <div class="cart-footer">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: 800; font-size: 1.3rem;">
+                <span>Total:</span><span id="cartTotal" style="color:var(--primary);">R$ 0,00</span>
+            </div>
+
+            <button class="btn-keep-buying" onclick="toggleCart()">
+                <i class="fas fa-arrow-left"></i> CONTINUAR COMPRANDO
+            </button>
+            
+            <button class="btn-checkout" onclick="openCheckoutModal()">FINALIZAR COMPRA <i class="fas fa-check"></i></button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="productModal" onclick="closeProductModal(event)">
+        <div class="modal-content-product">
+            <div class="close-modal-round" onclick="closeProductModal(null, true)">&times;</div>
+            <div class="prod-modal-img" id="pmImg"></div>
+            <div class="modal-body-scroll">
+                <h2 class="prod-modal-title" id="pmTitle"></h2>
+                <div class="prod-modal-desc" id="pmDesc"></div>
+            </div>
+            <div class="modal-product-footer"><button class="btn-add" id="pmBtn" style="width:100%; height:50px; font-size:1.1rem; box-shadow: 0 4px 0 #cc7000;">ADICIONAR AO PEDIDO</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="checkoutModal" style="align-items: flex-end;">
+        <div class="modal-content-checkout">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="font-size:1.8rem; font-weight:900; color:var(--dark);">Finalizar</h2>
+                <span onclick="closeCheckoutModal()" style="font-size:2.5rem; cursor:pointer; color:#ccc; line-height:0.8;">&times;</span>
+            </div>
+            
+            <div id="receiptPreview" class="receipt-preview"></div>
+
+            <div class="delivery-toggle">
+                <label class="mode-option">
+                    <input type="radio" name="deliveryMode" value="delivery" checked onchange="toggleDeliveryMode(this.value)">
+                    <span><i class="fas fa-motorcycle"></i> ENTREGA</span>
+                </label>
+                <label class="mode-option">
+                    <input type="radio" name="deliveryMode" value="pickup" onchange="toggleDeliveryMode(this.value)">
+                    <span><i class="fas fa-shopping-bag"></i> RETIRADA</span>
+                </label>
+            </div>
+
+            <div class="form-group"><label><i class="far fa-user"></i> Seu Nome</label><input type="text" id="name" class="form-control" placeholder="Digite seu nome completo"></div>
+            
+            <div id="addressSection">
+                
+                <div class="form-group">
+                    <label><i class="fas fa-map-marker-alt"></i> Rua / Endereço (Busca Automática)</label>
+                    <div style="font-size: 0.85rem; color:#666; margin-bottom:5px;">Digite o CEP ou Nome da Rua e clique na lupa:</div>
+                    <div class="input-row">
+                        <input type="text" id="addressSearch" class="form-control" placeholder="Ex: 13348-270 ou Rua dos Indaiás" onkeypress="handleEnter(event)">
+                        <button class="btn-search" onclick="buscarEndereco()"><i class="fas fa-search"></i></button>
+                    </div>
+                    <ul class="address-list" id="addressList"></ul>
+                    <div id="addressResult" style="font-size: 0.9rem; margin-top: 5px;"></div>
+                </div>
+
+                <div class="form-group"><label><i class="far fa-building"></i> Número e Complemento</label><input type="text" id="number" class="form-control" placeholder="Ex: 123, Casa dos fundos"></div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-map"></i> Bairro de Entrega (Obrigatório)</label>
+                    <select id="neighborhoodSelect" class="form-control" onchange="updateFeeFromNeighborhood()">
+                        <option value="" data-price="0">Selecione seu bairro...</option>
+                        <option value="Aldrovandia" data-price="25">Aldrovandia</option>
+                        <option value="Altos da Bela Vista" data-price="11">Altos da Bela Vista</option>
+                        <option value="American Park" data-price="10">American Park</option>
+                        <option value="Amstalden Residence" data-price="11">Amstalden Residence</option>
+                        <option value="Bairro Buru" data-price="7">Bairro Buru</option>
+                        <option value="Bairro Itaici" data-price="15">Bairro Itaici</option>
+                        <option value="Bairro Pimenta" data-price="9">Bairro Pimenta</option>
+                        <option value="Bairro Santa Cruz" data-price="9">Bairro Santa Cruz</option>
+                        <option value="Bairro da Grama" data-price="15">Bairro da Grama</option>
+                        <option value="Bairro do Moinho" data-price="11">Bairro do Moinho</option>
+                        <option value="Bairro dos Lopes" data-price="13">Bairro dos Lopes</option>
+                        <option value="Bom Princípio" data-price="8">Bom Princípio</option>
+                        <option value="Buru" data-price="7">Buru</option>
+                        <option value="Caldeira" data-price="6">Caldeira</option>
+                        <option value="Campo Bonito" data-price="9">Campo Bonito</option>
+                        <option value="Centro" data-price="10">Centro</option>
+                        <option value="Chácara Areal" data-price="15">Chácara Areal</option>
+                        <option value="Chácara Polaris" data-price="25">Chácara Polaris</option>
+                        <option value="Chácaras Videiras de Itaici" data-price="25">Chácaras Videiras de Itaici</option>
+                        <option value="Cidade Nova I" data-price="15">Cidade Nova I</option>
+                        <option value="Cidade Nova II" data-price="15">Cidade Nova II</option>
+                        <option value="Colinas de Indaiatuba" data-price="12">Colinas de Indaiatuba</option>
+                        <option value="Comercial João Narezzi" data-price="7">Comercial João Narezzi</option>
+                        <option value="Comercial Vitória Martini" data-price="10">Comercial Vitória Martini</option>
+                        <option value="Condomínio Cocais I e II" data-price="4">Condomínio Cocais I e II</option>
+                        <option value="Condomínio Vila Panorama" data-price="12">Condomínio Vila Panorama</option>
+                        <option value="Conjunto Habitacional Brigadeiro Faria Lima (CECAP)" data-price="8">Conjunto Habitacional Brigadeiro Faria Lima (CECAP)</option>
+                        <option value="Conjunto Habitacional João Pioli" data-price="7">Conjunto Habitacional João Pioli</option>
+                        <option value="Conjunto Habitacional Lúcio Artoni" data-price="15">Conjunto Habitacional Lúcio Artoni</option>
+                        <option value="Conjunto Habitacional Mário Araldo Candello" data-price="9">Conjunto Habitacional Mário Araldo Candello</option>
+                        <option value="Distrito Empresarial Bartolomai" data-price="15">Distrito Empresarial Bartolomai</option>
+                        <option value="Distrito Industrial (Recreio Campestre Joia / Europark / American Park)" data-price="7">Distrito Industrial (Recreio Campestre Joia / Europark / American Park)</option>
+                        <option value="Distrito Industrial Domingos Giomi" data-price="10">Distrito Industrial Domingos Giomi</option>
+                        <option value="Helvétia (Bairro e Condomínios)" data-price="25">Helvétia (Bairro e Condomínios)</option>
+                        <option value="Helvétia Park (I, II e III)" data-price="15">Helvétia Park (I, II e III)</option>
+                        <option value="Jardim Adriano" data-price="7">Jardim Adriano</option>
+                        <option value="Jardim Alice" data-price="7">Jardim Alice</option>
+                        <option value="Jardim Belo Horizonte" data-price="15">Jardim Belo Horizonte</option>
+                        <option value="Jardim Brasil" data-price="25">Jardim Brasil</option>
+                        <option value="Jardim Califórnia" data-price="8">Jardim Califórnia</option>
+                        <option value="Jardim Colonial" data-price="8">Jardim Colonial</option>
+                        <option value="Jardim Eldorado" data-price="15">Jardim Eldorado</option>
+                        <option value="Jardim Esplanada I" data-price="11">Jardim Esplanada I</option>
+                        <option value="Jardim Esplanada II" data-price="11">Jardim Esplanada II</option>
+                        <option value="Jardim Europa" data-price="11">Jardim Europa</option>
+                        <option value="Jardim Europa (Glebas)" data-price="11">Jardim Europa (Glebas)</option>
+                        <option value="Jardim Flamboyant" data-price="15">Jardim Flamboyant</option>
+                        <option value="Jardim Flórida" data-price="15">Jardim Flórida</option>
+                        <option value="Jardim Hubert" data-price="6">Jardim Hubert</option>
+                        <option value="Jardim Itatiaia" data-price="40">Jardim Itatiaia</option>
+                        <option value="Jardim Jequitibá" data-price="8">Jardim Jequitibá</option>
+                        <option value="Jardim Juliana" data-price="15">Jardim Juliana</option>
+                        <option value="Jardim Juscelino Kubitschek" data-price="15">Jardim Juscelino Kubitschek</option>
+                        <option value="Jardim Kioto" data-price="15">Jardim Kioto</option>
+                        <option value="Jardim Lauro Bueno de Camargo" data-price="15">Jardim Lauro Bueno de Camargo</option>
+                        <option value="Jardim Leonor" data-price="13">Jardim Leonor</option>
+                        <option value="Jardim Magnólia" data-price="15">Jardim Magnólia</option>
+                        <option value="Jardim Maison du Parc" data-price="15">Jardim Maison du Parc</option>
+                        <option value="Jardim Mantova" data-price="15">Jardim Mantova</option>
+                        <option value="Jardim Maria Dulce" data-price="11">Jardim Maria Dulce</option>
+                        <option value="Jardim Mariana" data-price="15">Jardim Mariana</option>
+                        <option value="Jardim Marina" data-price="13">Jardim Marina</option>
+                        <option value="Jardim Maringá" data-price="12">Jardim Maringá</option>
+                        <option value="Jardim Moacyr Arruda" data-price="12">Jardim Moacyr Arruda</option>
+                        <option value="Jardim Monte Verde" data-price="8">Jardim Monte Verde</option>
+                        <option value="Jardim Morada do Sol" data-price="5">Jardim Morada do Sol</option>
+                        <option value="Jardim Morumbi" data-price="13">Jardim Morumbi</option>
+                        <option value="Jardim Nely" data-price="9">Jardim Nely</option>
+                        <option value="Jardim Nova Indaiá" data-price="13">Jardim Nova Indaiá</option>
+                        <option value="Jardim Oliveira Camargo" data-price="13">Jardim Oliveira Camargo</option>
+                        <option value="Jardim Panorama" data-price="12">Jardim Panorama</option>
+                        <option value="Jardim Paraíso" data-price="12">Jardim Paraíso</option>
+                        <option value="Jardim Park Real" data-price="6">Jardim Park Real</option>
+                        <option value="Jardim Patrícia" data-price="15">Jardim Patrícia</option>
+                        <option value="Jardim Pau Preto" data-price="9">Jardim Pau Preto</option>
+                        <option value="Jardim Paulista I" data-price="4">Jardim Paulista I</option>
+                        <option value="Jardim Paulista II" data-price="4">Jardim Paulista II</option>
+                        <option value="Jardim Pedroso" data-price="10">Jardim Pedroso</option>
+                        <option value="Jardim Planalto" data-price="13">Jardim Planalto</option>
+                        <option value="Jardim Pompeia" data-price="9">Jardim Pompeia</option>
+                        <option value="Jardim Portal do Sol" data-price="8">Jardim Portal do Sol</option>
+                        <option value="Jardim Portal dos Ipês" data-price="15">Jardim Portal dos Ipês</option>
+                        <option value="Jardim Primavera" data-price="15">Jardim Primavera</option>
+                        <option value="Jardim Quintas da Terracota" data-price="15">Jardim Quintas da Terracota</option>
+                        <option value="Jardim Recanto do Vale" data-price="8">Jardim Recanto do Vale</option>
+                        <option value="Jardim Regente" data-price="15">Jardim Regente</option>
+                        <option value="Jardim Regina" data-price="9">Jardim Regina</option>
+                        <option value="Jardim Reserva Bom Viver" data-price="15">Jardim Reserva Bom Viver</option>
+                        <option value="Jardim Residencial Alpnach" data-price="10">Jardim Residencial Alpnach</option>
+                        <option value="Jardim Residencial Beira da Mata" data-price="15">Jardim Residencial Beira da Mata</option>
+                        <option value="Jardim Residencial Belle Vista" data-price="15">Jardim Residencial Belle Vista</option>
+                        <option value="Jardim Residencial Bréscia" data-price="15">Jardim Residencial Bréscia</option>
+                        <option value="Jardim Residencial Canto da Siriema" data-price="15">Jardim Residencial Canto da Siriema</option>
+                        <option value="Jardim Residencial Dona Lucilla" data-price="10">Jardim Residencial Dona Lucilla</option>
+                        <option value="Jardim Residencial Dona Maria Cândida" data-price="10">Jardim Residencial Dona Maria Cândida</option>
+                        <option value="Jardim Residencial Dona Maria José" data-price="11">Jardim Residencial Dona Maria José</option>
+                        <option value="Jardim Residencial Duas Marias" data-price="15">Jardim Residencial Duas Marias</option>
+                        <option value="Jardim Residencial Gênova" data-price="7">Jardim Residencial Gênova</option>
+                        <option value="Jardim Residencial Lagos de Shanadú" data-price="7">Jardim Residencial Lagos de Shanadú</option>
+                        <option value="Jardim Residencial London Park" data-price="15">Jardim Residencial London Park</option>
+                        <option value="Jardim Residencial Maison Suisse" data-price="15">Jardim Residencial Maison Suisse</option>
+                        <option value="Jardim Residencial Milano" data-price="7">Jardim Residencial Milano</option>
+                        <option value="Jardim Residencial Montreal" data-price="11">Jardim Residencial Montreal</option>
+                        <option value="Jardim Residencial Nova Veneza" data-price="7">Jardim Residencial Nova Veneza</option>
+                        <option value="Jardim Residencial Ravello" data-price="15">Jardim Residencial Ravello</option>
+                        <option value="Jardim Residencial Reserva da Mata" data-price="15">Jardim Residencial Reserva da Mata</option>
+                        <option value="Jardim Residencial Santa Clara" data-price="15">Jardim Residencial Santa Clara</option>
+                        <option value="Jardim Residencial Terra Magna" data-price="20">Jardim Residencial Terra Magna</option>
+                        <option value="Jardim Residencial Terra Nobre" data-price="8">Jardim Residencial Terra Nobre</option>
+                        <option value="Jardim Residencial Viena" data-price="12">Jardim Residencial Viena</option>
+                        <option value="Jardim Residencial Village Prado" data-price="25">Jardim Residencial Village Prado</option>
+                        <option value="Jardim Residencial Villaggio di Itaici" data-price="15">Jardim Residencial Villaggio di Itaici</option>
+                        <option value="Jardim Residencial da Villa Suíça" data-price="15">Jardim Residencial da Villa Suíça</option>
+                        <option value="Jardim Residencial di Itália" data-price="7">Jardim Residencial di Itália</option>
+                        <option value="Jardim Rêmulo Zoppi" data-price="8">Jardim Rêmulo Zoppi</option>
+                        <option value="Jardim Santa Rita" data-price="15">Jardim Santa Rita</option>
+                        <option value="Jardim Santo Antônio" data-price="5">Jardim Santo Antônio</option>
+                        <option value="Jardim Sevilha" data-price="20">Jardim Sevilha</option>
+                        <option value="Jardim São Conrado" data-price="4">Jardim São Conrado</option>
+                        <option value="Jardim São Francisco" data-price="7">Jardim São Francisco</option>
+                        <option value="Jardim São Paulo" data-price="20">Jardim São Paulo</option>
+                        <option value="Jardim Tancredo Neves" data-price="6">Jardim Tancredo Neves</option>
+                        <option value="Jardim Teotónio Vilela" data-price="5">Jardim Teotónio Vilela</option>
+                        <option value="Jardim Tropical" data-price="8">Jardim Tropical</option>
+                        <option value="Jardim Umuarama" data-price="15">Jardim Umuarama</option>
+                        <option value="Jardim União" data-price="4">Jardim União</option>
+                        <option value="Jardim Valença" data-price="15">Jardim Valença</option>
+                        <option value="Jardim Veneza" data-price="6">Jardim Veneza</option>
+                        <option value="Jardim Vila Paradiso" data-price="11">Jardim Vila Paradiso</option>
+                        <option value="Jardim Vila Romana" data-price="15">Jardim Vila Romana</option>
+                        <option value="Jardim Vista Alegre" data-price="15">Jardim Vista Alegre</option>
+                        <option value="Jardim Vésper" data-price="5">Jardim Vésper</option>
+                        <option value="Jardim das Maritacas" data-price="4">Jardim das Maritacas</option>
+                        <option value="Jardim do Sol" data-price="15">Jardim do Sol</option>
+                        <option value="Jardim do Valle" data-price="8">Jardim do Valle</option>
+                        <option value="Jardim dos Amarais" data-price="15">Jardim dos Amarais</option>
+                        <option value="Jardim dos Colibris" data-price="4">Jardim dos Colibris</option>
+                        <option value="Jardim dos Pássaros (Andorinhas, Beija-Flor, Canários, Sabiás)" data-price="7">Jardim dos Pássaros (Andorinhas, Beija-Flor, Canários, Sabiás)</option>
+                        <option value="Jardins de Itaici" data-price="20">Jardins de Itaici</option>
+                        <option value="Loteamento Aquisevive" data-price="20">Loteamento Aquisevive</option>
+                        <option value="Loteamento Green View Village" data-price="15">Loteamento Green View Village</option>
+                        <option value="Loteamento Park Gran Reserve" data-price="20">Loteamento Park Gran Reserve</option>
+                        <option value="Loteamento Quinta do Lago" data-price="20">Loteamento Quinta do Lago</option>
+                        <option value="Loteamento Videiras de Itaici" data-price="25">Loteamento Videiras de Itaici</option>
+                        <option value="Núcleo Residencial Deolinda" data-price="6">Núcleo Residencial Deolinda</option>
+                        <option value="Núcleo Residencial Faria Lima" data-price="8">Núcleo Residencial Faria Lima</option>
+                        <option value="Park Comercial de Indaiatuba" data-price="12">Park Comercial de Indaiatuba</option>
+                        <option value="Park Meraki" data-price="20">Park Meraki</option>
+                        <option value="Parque Boa Esperança" data-price="20">Parque Boa Esperança</option>
+                        <option value="Parque Campo Bonito" data-price="9">Parque Campo Bonito</option>
+                        <option value="Parque Imperador" data-price="7">Parque Imperador</option>
+                        <option value="Parque Residencial Indaiá" data-price="15">Parque Residencial Indaiá</option>
+                        <option value="Parque Residencial Sabiás" data-price="5">Parque Residencial Sabiás</option>
+                        <option value="Parque São Lourenço" data-price="15">Parque São Lourenço</option>
+                        <option value="Parque das Bandeiras" data-price="25">Parque das Bandeiras</option>
+                        <option value="Parque das Nações" data-price="6">Parque das Nações</option>
+                        <option value="Recanto Campestre Internacional de Viracopos (Várias Glebas)" data-price="25">Recanto Campestre Internacional de Viracopos (Várias Glebas)</option>
+                        <option value="Recanto das Flores" data-price="20">Recanto das Flores</option>
+                        <option value="Recanto do Vale" data-price="8">Recanto do Vale</option>
+                        <option value="Recreio Campestre Joia (Distrito Industrial)" data-price="7">Recreio Campestre Joia (Distrito Industrial)</option>
+                        <option value="Recreio Campestre Viracopos" data-price="25">Recreio Campestre Viracopos</option>
+                        <option value="Residencial Duas Marias" data-price="15">Residencial Duas Marias</option>
+                        <option value="Residencial Evidências" data-price="20">Residencial Evidências</option>
+                        <option value="Residencial Viena" data-price="12">Residencial Viena</option>
+                        <option value="Residencial Vila Paraty (Jardins do Império)" data-price="7">Residencial Vila Paraty (Jardins do Império)</option>
+                        <option value="Residencial Vila Rica (Jardins do Império)" data-price="8">Residencial Vila Rica (Jardins do Império)</option>
+                        <option value="Residencial Vila Ytu (Jardins do Império)" data-price="7">Residencial Vila Ytu (Jardins do Império)</option>
+                        <option value="Solar de Itamaracá" data-price="15">Solar de Itamaracá</option>
+                        <option value="Sítios de Recreio Jardins de Itaici" data-price="20">Sítios de Recreio Jardins de Itaici</option>
+                        <option value="Terra Nobre" data-price="12">Terra Nobre</option>
+                        <option value="Vale do Sol" data-price="15">Vale do Sol</option>
+                        <option value="Vila Almeida" data-price="12">Vila Almeida</option>
+                        <option value="Vila Avaí" data-price="15">Vila Avaí</option>
+                        <option value="Vila Brizola" data-price="15">Vila Brizola</option>
+                        <option value="Vila Costa e Silva" data-price="9">Vila Costa e Silva</option>
+                        <option value="Vila Fahl" data-price="10">Vila Fahl</option>
+                        <option value="Vila Georgina" data-price="15">Vila Georgina</option>
+                        <option value="Vila Inglesa" data-price="20">Vila Inglesa</option>
+                        <option value="Vila Maria Isabel" data-price="20">Vila Maria Isabel</option>
+                        <option value="Vila Mariana" data-price="15">Vila Mariana</option>
+                        <option value="Vila Pires da Cunha" data-price="6">Vila Pires da Cunha</option>
+                        <option value="Vila Rica" data-price="7">Vila Rica</option>
+                        <option value="Vila Sfeir" data-price="9">Vila Sfeir</option>
+                        <option value="Vila Suíça" data-price="15">Vila Suíça</option>
+                        <option value="Vila São José" data-price="9">Vila São José</option>
+                        <option value="Vila Teller" data-price="13">Vila Teller</option>
+                        <option value="Vila Todos os Santos" data-price="13">Vila Todos os Santos</option>
+                        <option value="Vila Vitória I" data-price="10">Vila Vitória I</option>
+                        <option value="Vila Vitória II" data-price="10">Vila Vitória II</option>
+                    </select>
+                    <div id="deliveryFeeDisplay" style="font-size: 0.9rem; color: var(--primary); font-weight: 600; margin-top: 5px;"></div>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <label><i class="far fa-calendar-alt"></i> Agendar (Opcional)</label>
+                <div class="input-row">
+                    <input type="date" id="scheduleDate" class="form-control" style="margin-bottom:0;">
+                    <input type="time" id="scheduleTime" class="form-control" style="margin-bottom:0;">
+                </div>
+            </div>
+
+            <div class="prefs-box">
+                <div id="sodaOptionsWrapper"></div>
+
+                <div class="prefs-title"><i class="fas fa-box-open"></i> Caixas Extras (R$ 3,00 cada)</div>
+                <input type="number" id="extraBoxes" class="form-control" value="0" min="0" onchange="calculateTotal()" oninput="calculateTotal()" style="margin-bottom:15px;">
+                
+                <div class="prefs-title"><i class="fas fa-utensils"></i> Sachês (Cortesia)</div>
+                <div class="checkbox-grid">
+                    <label class="check-label"><input type="checkbox" class="sache-opt" value="Ketchup"> Ketchup</label>
+                    <label class="check-label"><input type="checkbox" class="sache-opt" value="Maionese"> Maionese</label>
+                    <label class="check-label"><input type="checkbox" class="sache-opt" value="Mostarda"> Mostarda</label>
+                    <label class="check-label"><input type="checkbox" class="sache-opt" value="Pimenta"> Pimenta</label>
+                </div>
+
+                <div class="prefs-title" style="margin-top:15px;"><i class="fas fa-star"></i> Sabor Churros (Se pediu)</div>
+                <select id="churrosFlavor" class="form-control" style="margin-bottom:0; padding:10px;">
+                    <option value="">Não pedi churros</option>
+                    <option value="Doce de Leite">Doce de Leite</option>
+                    <option value="Chocolate">Chocolate</option>
+                    <option value="Misto">Misto (D. Leite + Choc)</option>
+                </select>
+            </div>
+
+            <div class="form-group"><label><i class="far fa-comment-dots"></i> Observações</label><textarea id="obs" class="form-control" placeholder=""></textarea></div>
+            
+            <div class="form-group"><label><i class="far fa-credit-card"></i> Pagamento</label>
+                <select id="payment" class="form-control" onchange="togglePix(this.value)">
+                    <option value="">Selecione a forma de pagamento...</option>
+                    <option value="PIX">PIX (Chave Celular)</option>
+                    <option value="Cartão">Cartão (Maquininha na entrega)</option>
+                    <option value="Dinheiro">Dinheiro (Precisa de troco? Avise na obs)</option>
+                </select>
+            </div>
+
+            <div class="pix-area" id="pixArea">
+                <div style="font-size: 1.1rem; margin-bottom:10px; font-weight:bold; color:var(--dark);"><i class="brands fa-pix" style="color:#27ae60;"></i> Chave PIX (Celular):</div>
+                <div style="font-weight:900; color:#27ae60; font-size:1.5rem; user-select:all; letter-spacing: 1px; margin-bottom: 5px;">19991122867</div>
+                <div style="font-size:0.85rem; color:#666;">Nome do Favorecido: Michel Silva Minuceli - Copie a chave e envie o comprovante.</div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 1.4rem; margin-bottom: 30px; border-top: 2px solid #eee; padding-top: 25px; color:var(--dark); align-items: center;">
+                <span>Total Final:</span><span style="color: var(--primary); font-size: 1.8rem;" id="finalTotal">R$ 0,00</span>
+            </div>
+
+            <button class="btn-action btn-receipt" onclick="generateReceipt()"><i class="fas fa-file-invoice"></i> VER PRÉVIA DA NOTA</button>
+            <button class="btn-action btn-whatsapp" onclick="sendOrder()"><i class="fab fa-whatsapp" style="font-size: 1.3rem;"></i> ENVIAR PEDIDO NO ZAP</button>
+        </div>
+    </div>
+
+    <script>
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQUyydUxUwHodZW2M9qEWz5H19Ii7OcB2pF71DZ6lwolrZFreBisI7VOWLbrz2Ix88i7ITbP5DN2EPZ/pub?output=csv&t=' + Date.now();
+        const WHATSAPP_NUMBER = "5519994990025";
+        
+        let products = [];
+        let cart = [];
+        let deliveryFee = 0;
+        let isPickup = false; 
+
+        // --- CARREGAMENTO DO CARDÁPIO (MANTIDO) ---
+        async function loadMenu() {
+            const grid = document.getElementById('productsGrid');
+            try {
+                const response = await fetch(SHEET_URL);
+                if(!response.ok) throw new Error("Erro na conexão");
+                const data = await response.text();
+                products = parseCSV(data); 
+                if(products.length === 0) grid.innerHTML = '<div class="loading-container"><h3>Cardápio Vazio</h3></div>';
+                else render(); 
+            } catch (error) {
+                console.error(error);
+                grid.innerHTML = '<div class="error-card"><h3>Erro de Conexão</h3></div>';
+            }
+        }
+
+        function parseCSV(text) {
+            const rows = []; let row = []; let inQuote = false; let currentCell = '';
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i]; const nextChar = text[i + 1];
+                if (char === '"') { if (inQuote && nextChar === '"') { currentCell += '"'; i++; } else { inQuote = !inQuote; } } 
+                else if (char === ',' && !inQuote) { row.push(currentCell.trim()); currentCell = ''; } 
+                else if ((char === '\r' || char === '\n') && !inQuote) { if (currentCell || row.length > 0) row.push(currentCell.trim()); if (row.length > 0) rows.push(row); row = []; currentCell = ''; } 
+                else { currentCell += char; }
+            }
+            if (currentCell || row.length > 0) { row.push(currentCell.trim()); rows.push(row); }
+            const result = []; const clean = (text) => text ? text.trim().replace(/^"|"$/g, '').replace(/""/g, '"') : "";
+            for (let i = 1; i < rows.length; i++) {
+                const cols = rows[i];
+                if (cols.length >= 7) {
+                    const priceStr = cols[3].replace('R$', '').replace(/"/g, '').replace(',', '.').trim();
+                    const price = parseFloat(priceStr);
+                    if (!isNaN(price)) result.push({ id: i, type: clean(cols[1]), name: clean(cols[2]), price: price, desc: clean(cols[4]), longDesc: clean(cols[5]), img: clean(cols[6]) || "fa-utensils" });
+                }
+            }
+            return result;
+        }
+
+        function render(filterType = 'todos') {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+            const items = filterType === 'todos' ? products : products.filter(p => p.type.toLowerCase() === filterType.toLowerCase());
+            if(items.length === 0) { grid.innerHTML = '<div class="loading-container"><p>Nenhum item nesta categoria.</p></div>'; return; }
+            items.forEach(p => {
+                let imageHtml = p.img && p.img.includes('http') ? `<img src="${p.img}" alt="${p.name}">` : `<i class="fas ${p.img}"></i>`;
+                grid.innerHTML += `<div class="product-card"><div class="product-img" onclick="openProductDetails(${p.id})">${imageHtml}<span class="cat-tag">${p.type}</span></div><div class="product-info"><div class="product-title" onclick="openProductDetails(${p.id})">${p.name}</div><div class="product-desc">${p.desc}</div><div class="product-price">R$ ${p.price.toFixed(2).replace('.', ',')}</div><div class="button-group"><button class="btn-info" onclick="openProductDetails(${p.id})"><i class="fas fa-info"></i></button><button class="btn-add" onclick="addToCart(${p.id})">ADICIONAR</button></div></div></div>`;
+            });
+        }
+
+        function openProductDetails(id) {
+            const p = products.find(x => x.id === id); if(!p) return;
+            document.getElementById('pmTitle').innerText = p.name;
+            document.getElementById('pmDesc').innerText = p.longDesc ? p.longDesc : p.desc;
+            const imgContainer = document.getElementById('pmImg');
+            imgContainer.innerHTML = p.img && p.img.includes('http') ? `<img src="${p.img}" alt="${p.name}">` : `<i class="fas ${p.img}"></i>`;
+            const btn = document.getElementById('pmBtn');
+            btn.innerHTML = `ADICIONAR • R$ ${p.price.toFixed(2).replace('.', ',')}`;
+            btn.onclick = function() { addToCart(p.id); closeProductModal(null, true); };
+            document.getElementById('productModal').style.display = 'flex';
+        }
+
+        function closeProductModal(e, force = false) { if (force || e.target.id === 'productModal') document.getElementById('productModal').style.display = 'none'; }
+        function filterCategory(type, btn) { document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); render(type); }
+        function addToCart(id) { cart.push(products.find(p => p.id === id)); updateCart(); toggleCart(true); }
+        function removeFromCart(index) { cart.splice(index, 1); updateCart(); }
+        function toggleCart(forceOpen) { const sb = document.getElementById('cartSidebar'); if(typeof forceOpen === 'boolean') { forceOpen ? sb.classList.add('active') : sb.classList.remove('active'); } else { sb.classList.toggle('active'); } }
+        
+        function updateCart() {
+            document.getElementById('cartCount').innerText = cart.length;
+            const container = document.getElementById('cartItems'); container.innerHTML = '';
+            let total = 0;
+            if(cart.length === 0) container.innerHTML = '<div style="text-align:center; color:#999; margin-top:50px;"><i class="fas fa-shopping-basket fa-3x" style="color:#eee; margin-bottom:20px;"></i><p>Seu carrinho está vazio</p></div>'; 
+            else cart.forEach((item, index) => { total += item.price; container.innerHTML += `<div class="cart-item"><div><span class="cart-item-name">${item.name}</span> <small style="color:var(--primary); font-weight:bold;">R$ ${item.price.toFixed(2).replace('.',',')}</small></div><i class="fas fa-trash-alt" style="color:#e74c3c; cursor:pointer;" onclick="removeFromCart(${index})"></i></div>`; });
+            calculateTotal();
+        }
+
+        // --- BUSCA INTELIGENTE COM AUTO-SELEÇÃO DE BAIRRO ---
+        function handleEnter(e) { 
+            if(e.key === 'Enter') {
+                e.preventDefault(); 
+                buscarEndereco(); 
+            }
+        }
+
+        async function buscarEndereco() {
+            const query = document.getElementById('addressSearch').value.trim();
+            const list = document.getElementById('addressList');
+            const resultDiv = document.getElementById('addressResult');
+            
+            list.style.display = 'none';
+            list.innerHTML = '';
+            resultDiv.innerHTML = "Buscando...";
+
+            // 1. TENTAR COMO CEP
+            const cepClean = query.replace(/\D/g, '');
+            if (cepClean.length === 8) {
+                try {
+                    const respViaCep = await fetch(`https://viacep.com.br/ws/${cepClean}/json/`);
+                    const dataViaCep = await respViaCep.json();
+                    
+                    if (!dataViaCep.erro) {
+                        const fullAddr = `${dataViaCep.logradouro}, ${dataViaCep.bairro}, Indaiatuba - SP`;
+                        document.getElementById('addressSearch').value = fullAddr; 
+                        resultDiv.innerHTML = "<span style='color:green'>Endereço encontrado! Verifique o bairro abaixo.</span>";
+                        
+                        // Tentar auto-selecionar bairro
+                        trySelectNeighborhood(dataViaCep.bairro);
+                        return;
+                    }
+                } catch (e) { console.log("Erro ViaCEP, tentando texto..."); }
+            }
+
+            // 2. BUSCA POR TEXTO
+            if(query.length < 3) {
+                resultDiv.innerHTML = "";
+                return alert("Digite o CEP ou nome da rua.");
+            }
+            
+            try {
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}, Indaiatuba, SP&addressdetails=1&limit=5`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if(data.length === 0) {
+                    resultDiv.innerHTML = "<span style='color:red'>Não encontrado. Tente digitar apenas o nome da rua.</span>";
+                    return;
+                }
+
+                resultDiv.innerHTML = "Selecione o endereço correto:";
+                list.style.display = 'block';
+
+                data.forEach(place => {
+                    const li = document.createElement('li');
+                    let cleanName = place.display_name.split(',')[0]; 
+                    if(place.address && place.address.road) cleanName = place.address.road;
+                    
+                    // Mostra bairro se tiver
+                    const bairroApi = place.address.suburb || place.address.neighbourhood || place.address.residential || "";
+                    if(bairroApi) cleanName += ` - ${bairroApi}`;
+                    
+                    li.innerText = cleanName;
+                    li.onclick = () => {
+                        document.getElementById('addressSearch').value = cleanName;
+                        list.style.display = 'none';
+                        resultDiv.innerHTML = "";
+                        trySelectNeighborhood(bairroApi);
+                    };
+                    list.appendChild(li);
+                });
+
+            } catch(e) {
+                console.error(e);
+                resultDiv.innerHTML = "<span style='color:red'>Erro de conexão.</span>";
+            }
+        }
+
+        function trySelectNeighborhood(bairroName) {
+            if(!bairroName) return;
+            const select = document.getElementById('neighborhoodSelect');
+            const search = bairroName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // remove acentos
+            
+            // Tenta encontrar match na lista
+            for(let i=0; i<select.options.length; i++) {
+                const optText = select.options[i].text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                // Verifica se contém o nome
+                if(optText.includes(search) || search.includes(optText)) {
+                    select.selectedIndex = i;
+                    updateFeeFromNeighborhood();
+                    document.getElementById('addressResult').innerHTML += "<br><small style='color:var(--primary)'>Bairro selecionado automaticamente!</small>";
+                    return;
+                }
+            }
+            // Se não achou, reseta para forçar seleção
+            select.value = "";
+            updateFeeFromNeighborhood();
+        }
+
+        // --- LÓGICA DE FRETE ---
+
+        function updateFeeFromNeighborhood() {
+            const select = document.getElementById('neighborhoodSelect');
+            const selectedOption = select.options[select.selectedIndex];
+            const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+            
+            deliveryFee = price;
+            
+            const display = document.getElementById('deliveryFeeDisplay');
+            if(deliveryFee > 0) {
+                display.innerText = "Taxa de entrega: R$ " + deliveryFee.toFixed(2).replace('.', ',');
+            } else {
+                display.innerText = "";
+            }
+            calculateTotal();
+        }
+
+        function toggleDeliveryMode(mode) {
+            isPickup = (mode === 'pickup');
+            document.getElementById('addressSection').style.display = isPickup ? 'none' : 'block';
+            
+            if(isPickup) {
+                deliveryFee = 0;
+            } else {
+                updateFeeFromNeighborhood();
+            }
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            let cartTotal = cart.reduce((acc, item) => acc + item.price, 0);
+            const extraBoxesQty = parseInt(document.getElementById('extraBoxes').value) || 0;
+            const extraBoxesCost = extraBoxesQty * 3.00;
+            const fee = isPickup ? 0 : deliveryFee;
+            const final = cartTotal + fee + extraBoxesCost;
+            
+            document.getElementById('cartTotal').innerText = `R$ ${cartTotal.toFixed(2).replace('.',',')}`; 
+            document.getElementById('finalTotal').innerText = `R$ ${final.toFixed(2).replace('.',',')}`; 
+            return { cartTotal, fee, extraBoxesCost, final };
+        }
+
+        function renderSodaOptions() {
+            const wrapper = document.getElementById('sodaOptionsWrapper');
+            wrapper.innerHTML = ''; 
+            let hasSoda = false;
+
+            cart.forEach((item, index) => {
+                let options = [];
+                const name = item.name.toLowerCase();
+
+                // --- CORREÇÃO AQUI: TRAVA DE SEGURANÇA ---
+                // Se o nome do produto tiver a palavra "monte", o sistema IGNORA 
+                // e não oferece bebida grátis, mesmo que tenha números como "40" ou "20".
+                if (name.includes('monte')) {
+                    return; // Pula para o próximo item do carrinho
+                }
+
+                // Lógica dos Combos com Bebida Grátis
+                // Só entra aqui se NÃO tiver "monte" no nome
+                if (name.includes('combo 0') || name.includes('combo 2')) { 
+                    options = ['Coca-Cola (Lata 350ml)', 'Guaraná (Lata 350ml)']; 
+                } 
+                else if (name.includes('combo 4') || name.includes('combo 6')) { 
+                    options = ['Coca-Cola (1 Litro)', 'Guaraná (1.5 Litros)']; 
+                } 
+                else if (name.includes('combo 7')) { 
+                    options = ['Coca-Cola (2 Litros)', 'Guaraná (2 Litros)']; 
+                }
+
+                // Se encontrou alguma opção de bebida, monta o HTML
+                if (options.length > 0) {
+                    hasSoda = true;
+                    let optionsHtml = options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                    
+                    wrapper.innerHTML += `
+                        <div style="margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px;">
+                            <label style="font-size: 0.9rem; font-weight:bold; color:var(--primary-dark); display:block; margin-bottom:5px;">
+                                <i class="fas fa-wine-bottle"></i> Bebida para: ${item.name}
+                            </label>
+                            <select class="form-control soda-select" data-item-index="${index}" style="margin-bottom:0; padding:10px;">
+                                ${optionsHtml}
+                            </select>
+                        </div>`;
+                }
+            });
+
+            // Se tiver pelo menos uma bebida, adiciona o título da seção
+            if (hasSoda) {
+                wrapper.innerHTML = `<div class="prefs-title" style="margin-top:0;"><i class="fas fa-glass-cheers"></i> Escolha as Bebidas</div>` + wrapper.innerHTML;
+            }
+        }
+
+        function openCheckoutModal() {
+            if(cart.length === 0) return alert('Carrinho vazio!');
+            toggleCart(false);
+            renderSodaOptions();
+            document.getElementById('checkoutModal').style.display = 'flex';
+            calculateTotal();
+        }
+
+        function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
+        function togglePix(val) { document.getElementById('pixArea').style.display = val === 'PIX' ? 'block' : 'none'; }
+        function sendOrder() {
+            // --- VALIDAÇÃO DE HORÁRIO ATUALIZADA (PEDIDO DO IRMÃO) ---
+            const now = new Date();
+            const currentDay = now.getDay(); // 0 = Domingo, 1 = Segunda...
+            const currentHour = now.getHours();
+            
+            const schedDateVal = document.getElementById('scheduleDate').value;
+            const schedTimeVal = document.getElementById('scheduleTime').value;
+            const hasSchedule = (schedDateVal !== "");
+            
+            // 1. REGRAS PARA QUEM ESTÁ AGENDANDO
+            if (hasSchedule) {
+                if (!schedTimeVal) { alert("⏰ Por favor, preencha o HORÁRIO do agendamento."); return; }
+                
+                const parts = schedDateVal.split('-'); 
+                // Cria data baseada no input (Mês no JS começa em 0)
+                const scheduledDateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+                const scheduledDay = scheduledDateObj.getDay();
+                const scheduledHour = parseInt(schedTimeVal.split(':')[0]); 
+
+                // Valida Terça-feira (Fechado)
+                if (scheduledDay === 2) { alert("📅 DATA INDISPONÍVEL!\n\nA loja não abre às terças-feiras."); return; }
+                
+                // Valida Domingo (Limite até 18h)
+                if (scheduledDay === 0 && scheduledHour >= 18) { alert("📅 DOMINGO FECHAMOS MAIS CEDO!\n\nAos domingos recebemos pedidos apenas até as 18h."); return; }
+
+                // Valida Limites Gerais de funcionamento (7h às 22h)
+                if (scheduledHour < 7 || scheduledHour >= 22) { alert("⏰ HORÁRIO INDISPONÍVEL!\n\nEntregas das 07h às 22h."); return; }
+            }
+
+            // 2. REGRAS PARA PEDIDO "AGORA" (SEM AGENDAMENTO)
+            if (!hasSchedule) {
+                // Fechado Terça-feira
+                if (currentDay === 2) { alert("🛑 A LOJA ESTÁ FECHADA HOJE (TERÇA-FEIRA)!"); return; }
+
+                // Regra do Domingo: Bloqueia depois das 18h
+                if (currentDay === 0 && currentHour >= 18) { 
+                    alert("🛑 A LOJA JÁ FECHOU!\n\nAos domingos funcionamos somente até às 18h."); 
+                    return; 
+                }
+
+                // Regra da Manhã (A "pegadinha" do 7h as 9h)
+                if (currentHour < 9) {
+                    if (currentHour >= 7) {
+                        // Entre 7h e 9h: Pode, mas só agendando
+                        alert("⚠️ AVISO MATINAL\n\nEntre 07h e 09h, atendemos somente com AGENDAMENTO.\n\nPor favor, selecione uma data e horário no campo 'Agendar' mais abaixo.");
+                    } else {
+                        // Antes das 7h: Fechado total
+                        alert("💤 A LOJA ESTÁ FECHADA AGORA!\n\nAtendimento normal a partir das 09h (ou agendado a partir das 07h).");
+                    }
+                    return;
+                }
+
+                // Regra da Noite (Depois das 22h) - exceto domingo que já barramos acima
+                if (currentHour >= 22) { alert("💤 A LOJA ESTÁ FECHADA AGORA!\n\nEncerramos às 22h."); return; }
+            }
+
+            // --- FIM DA VALIDAÇÃO, INÍCIO DA MONTAGEM DO PEDIDO ---
+
+            const name = document.getElementById('name').value;
+            const payment = document.getElementById('payment').value;
+            const obs = document.getElementById('obs').value;
+            const extraBoxesQty = document.getElementById('extraBoxes').value;
+            const saches = Array.from(document.querySelectorAll('.sache-opt:checked')).map(cb => cb.value).join(', ');
+            const churros = document.getElementById('churrosFlavor').value;
+            const neighborhood = document.getElementById('neighborhoodSelect').value;
+
+            if(!name || !payment) return alert("Preencha Nome e Pagamento.");
+            
+            // VALIDAÇÃO OBRIGATÓRIA DE BAIRRO
+            if(!isPickup && !neighborhood) {
+                return alert("⚠️ Por favor, SELECIONE O BAIRRO na lista para calcularmos a entrega.");
+            }
+
+            const { cartTotal, fee, extraBoxesCost, final } = calculateTotal();
+            
+            // Mensagem de tempo dinâmica
+            const timeMessage = isPickup 
+                ? "🕒 Tempo estimado para retirada: 35 a 30 minutos." 
+                : "🕒 Tempo estimado de entrega: 35 a 55 minutos.";
+
+            let addressTxt = "";
+            if (isPickup) {
+                addressTxt = "📍 *VOU RETIRAR NA LOJA*";
+            } else {
+                const street = document.getElementById('addressSearch').value;
+                const number = document.getElementById('number').value;
+                addressTxt = `🛵 *ENTREGAR EM:*\nBairro: ${neighborhood}\n${street}, Nº ${number}`;
+            }
+
+            let agendamentoTxt = schedDateVal && schedTimeVal ? `\n📅 *AGENDADO:* ${schedDateVal.split('-').reverse().join('/')} às ${schedTimeVal}` : `\n🚀 *PARA AGORA*`;
+            
+            const sodaSelects = document.querySelectorAll('.soda-select');
+            let sodaChoices = {};
+            sodaSelects.forEach(select => {
+                const index = select.getAttribute('data-item-index');
+                sodaChoices[index] = select.value;
+            });
+
+            let msg = `*NOVO PEDIDO MK*\n${agendamentoTxt}\n\n📋 *ITENS:*\n`;
+            
+            cart.forEach((item, index) => { 
+                msg += `▪️ 1x ${item.name}\n`; 
+                if(sodaChoices[index]) { msg += `   ↳ 🥤 ${sodaChoices[index]}\n`; }
+            });
+
+            if(parseInt(extraBoxesQty) > 0) msg += `▪️ ${extraBoxesQty}x Caixas Extras (+R$ ${extraBoxesCost.toFixed(2)})\n`;
+
+            msg += `\n📦 Subtotal: R$ ${cartTotal.toFixed(2)}\n`;
+            if(isPickup) msg += `🛑 *RETIRADA (Grátis)*\n`;
+            else msg += `🛵 Entrega: R$ ${fee.toFixed(2)}\n`;
+            
+            msg += `✅ *TOTAL FINAL: R$ ${final.toFixed(2)}*\n\n👤 *Cliente:* ${name}\n${addressTxt}\n💰 *Pagamento:* ${payment}\n\n📝 *PREFERÊNCIAS:*\nSachês: ${saches || 'Nenhum'}\nSabor Churros: ${churros || '-'}\nObs: ${obs}\n\n${timeMessage}`;
+            
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+             
+        
+        function generateReceipt() {
+            const date = new Date().toLocaleString('pt-BR');
+            const { cartTotal, fee, extraBoxesCost, final } = calculateTotal();
+            const extraBoxesQty = document.getElementById('extraBoxes').value;
+            // Coleta os sachês marcados
+            const saches = Array.from(document.querySelectorAll('.sache-opt:checked')).map(cb => cb.value).join(', ');
+            const churros = document.getElementById('churrosFlavor').value;
+
+            // Coleta as bebidas selecionadas (se houver alguma)
+            const sodaSelects = document.querySelectorAll('.soda-select');
+            let sodaChoices = {};
+            sodaSelects.forEach(select => {
+                const index = select.getAttribute('data-item-index');
+                sodaChoices[index] = select.value;
+            });
+
+            // Monta a lista de itens com visual corrigido (Flexbox)
+            let itemsHtml = ''; 
+            cart.forEach((item, index) => { 
+                itemsHtml += `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; border-bottom: 1px dotted #ddd; padding-bottom: 2px;">
+                    <div style="padding-right: 10px; width: 70%;">1x ${item.name}</div>
+                    <div style="font-weight: bold; white-space: nowrap;">R$ ${item.price.toFixed(2).replace('.', ',')}</div>
+                </div>`; 
+                
+                // Só adiciona a linha de bebida se realmente tiver uma escolhida
+                if(sodaChoices[index]) { 
+                    itemsHtml += `<div style="margin-bottom:5px; font-size:0.8rem; color:#666; margin-top: -3px;"> ↳ Bebida: ${sodaChoices[index]}</div>`; 
+                }
+            });
+            
+            let extrasHtml = parseInt(extraBoxesQty) > 0 ? `<div style="display: flex; justify-content: space-between;"><span>+ ${extraBoxesQty}x Caixas Extras</span> <span>R$ ${extraBoxesCost.toFixed(2).replace('.', ',')}</span></div>` : '';
+            
+            // Mensagem de tempo
+            const timeMessage = isPickup 
+                ? "🕒 Tempo estimado para retirada: 35 a 30 minutos." 
+                : "🕒 Tempo estimado de entrega: 35 a 55 minutos.";
+
+            const html = `
+                <div style="text-align:center; font-weight:bold; font-size: 1.1rem; margin-bottom: 5px;">MK SALGADOS</div>
+                <div style="text-align:center; font-size:0.8rem; margin-bottom:15px; color:#555;">${date}</div>
+                
+                <div style="margin-bottom: 15px;">
+                    ${itemsHtml}
+                    ${extrasHtml}
+                </div>
+                
+                <div style="background: #eee; padding: 10px; border-radius: 5px; font-size: 0.9rem;">
+                    <div style="display:flex; justify-content:space-between;"><span>Subtotal:</span> <span>R$ ${cartTotal.toFixed(2).replace('.', ',')}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>${isPickup ? 'Retirada:' : 'Taxa de Entrega:'}</span> <span>${isPickup ? 'Grátis' : 'R$ ' + fee.toFixed(2).replace('.', ',')}</span></div>
+                    <div style="display:flex; justify-content:space-between; margin-top: 5px; font-weight: 900; font-size: 1.1rem; color: var(--dark);"><span>TOTAL:</span> <span>R$ ${final.toFixed(2).replace('.', ',')}</span></div>
+                </div>
+
+                <div style="margin-top:15px; font-size:0.85rem; border-top:1px dashed #ccc; padding-top:10px;">
+                    <b>Preferências:</b><br>
+                    Sachês: ${saches || 'Nenhum'}<br>
+                    Churros: ${churros || '-'}<br>
+                </div>
+                
+                <div style="margin-top:20px; padding-top:10px; border-top: 2px solid #333; text-align:center; font-weight:bold; font-size:0.9rem;">
+                    ${timeMessage}<br>
+                    <span style="font-weight:normal; font-size:0.8rem;">Agradecemos a preferência!</span>
+                </div>
+            `;
+            
+            const previewDiv = document.getElementById('receiptPreview');
+            previewDiv.innerHTML = html;
+            previewDiv.style.display = 'block';
+
+            previewDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        window.onload = loadMenu;
+    </script>
+</body>
+</html>
