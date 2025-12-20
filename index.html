@@ -610,6 +610,7 @@
         // --- BUSCA INTELIGENTE (CORRIGIDA) ---
         function handleEnter(e) { if(e.key === 'Enter') { e.preventDefault(); buscarEndereco(); } }
 
+        // --- BUSCA DE ENDEREÇO ROBUSTA (ViaCEP + Fallback BrasilAPI) ---
         async function buscarEndereco() {
             const query = document.getElementById('addressSearch').value.trim();
             const list = document.getElementById('addressList');
@@ -619,46 +620,55 @@
             list.innerHTML = '';
             resultDiv.innerHTML = "Buscando...";
 
-            // Lógica de CEP (Prioridade e Isolamento)
+            // 1. TENTATIVA POR CEP (8 dígitos)
             const cepClean = query.replace(/\D/g, '');
             
             if (cepClean.length === 8) {
-                // SE TEM 8 DIGITOS, É TRATADO EXCLUSIVAMENTE COMO CEP
                 try {
-                    const respViaCep = await fetch(`https://viacep.com.br/ws/${cepClean}/json/`);
-                    const dataViaCep = await respViaCep.json();
+                    // Tenta ViaCEP primeiro
+                    let data = await fetchViaCep(cepClean);
                     
-                    if (!dataViaCep.erro) {
-                        const fullAddr = `${dataViaCep.logradouro}, ${dataViaCep.bairro}, Indaiatuba - SP`;
+                    // Se ViaCEP falhar, tenta BrasilAPI
+                    if (!data) {
+                        console.log("ViaCEP falhou, tentando BrasilAPI...");
+                        data = await fetchBrasilApi(cepClean);
+                    }
+
+                    // Se conseguiu dados de alguma das duas
+                    if (data && !data.erro) {
+                        const fullAddr = `${data.logradouro}, ${data.bairro}, Indaiatuba - SP`;
                         document.getElementById('addressSearch').value = fullAddr; 
-                        resultDiv.innerHTML = "<span style='color:green'>Endereço encontrado via CEP!</span>";
-                        trySelectNeighborhood(dataViaCep.bairro);
-                        return; // SUCESSO DO CEP - PARA AQUI
+                        resultDiv.innerHTML = "<span style='color:green'>Endereço encontrado!</span>";
+                        trySelectNeighborhood(data.bairro);
+                        return;
                     } else {
                         resultDiv.innerHTML = "<span style='color:red'>CEP não encontrado. Por favor, digite o nome da rua.</span>";
-                        return; // FALHA DO CEP - PARA AQUI (Não tenta mapa para evitar rodovia)
+                        return;
                     }
-                } catch (e) { 
-                    console.log("Erro ViaCEP");
-                    resultDiv.innerHTML = "<span style='color:red'>Erro ao buscar CEP. Verifique a conexão.</span>";
+                } catch (e) {
+                    console.error("Erro fatal na busca de CEP:", e);
+                    resultDiv.innerHTML = "<span style='color:red'>Erro na busca. Tente digitar o nome da rua.</span>";
                     return;
                 }
             }
 
-            // Se chegou aqui, não é um CEP válido (tem letras ou numero errado de digitos)
-            // Então faz busca por NOME DE RUA no OpenStreetMap
+            // 2. BUSCA POR NOME DA RUA (Mapa)
             if(query.length < 3) { 
                 resultDiv.innerHTML = ""; 
                 return alert("Digite o CEP (8 números) ou o nome da rua."); 
             }
             
             try {
+                // Busca no OpenStreetMap
                 const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}, Indaiatuba, SP&addressdetails=1&limit=5`;
                 const response = await fetch(url);
+                
+                if (!response.ok) throw new Error("Erro no serviço de mapa");
+                
                 const data = await response.json();
                 
                 if(data.length === 0) { 
-                    resultDiv.innerHTML = "<span style='color:red'>Rua não encontrada. Tente digitar o CEP.</span>"; 
+                    resultDiv.innerHTML = "<span style='color:red'>Rua não encontrada. Verifique a escrita.</span>"; 
                     return; 
                 }
 
@@ -671,6 +681,7 @@
                     if(place.address && place.address.road) cleanName = place.address.road;
                     const bairroApi = place.address.suburb || place.address.neighbourhood || place.address.residential || "";
                     if(bairroApi) cleanName += ` - ${bairroApi}`;
+                    
                     li.innerText = cleanName;
                     li.onclick = () => {
                         document.getElementById('addressSearch').value = cleanName;
@@ -680,7 +691,30 @@
                     };
                     list.appendChild(li);
                 });
-            } catch(e) { console.error(e); resultDiv.innerHTML = "<span style='color:red'>Erro de conexão com o mapa.</span>"; }
+            } catch(e) { 
+                console.error(e); 
+                resultDiv.innerHTML = "<span style='color:red'>Erro de conexão com o mapa.</span>"; 
+            }
+        }
+
+        // Funções auxiliares de API
+        async function fetchViaCep(cep) {
+            try {
+                const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                if (!res.ok) throw new Error("Erro ViaCEP");
+                const data = await res.json();
+                if (data.erro) return null;
+                return { logradouro: data.logradouro, bairro: data.bairro };
+            } catch (e) { return null; }
+        }
+
+        async function fetchBrasilApi(cep) {
+            try {
+                const res = await fetch(`https://brasilapi.com.br/api/cep/v1/${cep}`);
+                if (!res.ok) throw new Error("Erro BrasilAPI");
+                const data = await res.json();
+                return { logradouro: data.street, bairro: data.neighborhood }; // BrasilAPI usa chaves diferentes (street/neighborhood)
+            } catch (e) { return null; }
         }
 
         function trySelectNeighborhood(bairroName) {
