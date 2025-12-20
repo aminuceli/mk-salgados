@@ -99,7 +99,6 @@
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e0d0b0; padding-bottom: 15px; }
         .cart-footer { padding: 20px; background: white; border-top: 1px solid #eee; }
         
-        /* BOTÃO CONTINUAR COMPRANDO - ADICIONADO AQUI */
         .btn-keep-buying { width: 100%; padding: 12px; margin-bottom: 10px; background: transparent; border: 2px solid #ccc; color: #666; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.95rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-keep-buying:hover { background: #f5f5f5; border-color: #bbb; }
         .btn-keep-buying:active { transform: scale(0.98); }
@@ -251,7 +250,7 @@
             <div id="addressSection">
                 
                 <div class="form-group">
-                    <label><i class="fas fa-map-marker-alt"></i> Digite o CEP ou Nome da Rua e clique na lupa</label>
+                    <label><i class="fas fa-map-marker-alt"></i> Digite o CEP ou nome da rua e clique na lupa:</label>
                     <div style="font-size: 0.85rem; color:#666; margin-bottom:5px;"></div>
                     <div class="input-row">
                         <input type="text" id="addressSearch" class="form-control" placeholder="Ex: 13348-270 ou Rua dos Indaiás" onkeypress="handleEnter(event)">
@@ -471,6 +470,8 @@
             </div>
 
             <div class="prefs-box">
+                <div id="comboOptionsWrapper"></div>
+
                 <div id="sodaOptionsWrapper"></div>
 
                 <div class="prefs-title"><i class="fas fa-box-open"></i> Caixas Extras (R$ 3,00 cada)</div>
@@ -493,7 +494,7 @@
                 </select>
             </div>
 
-            <div class="form-group"><label><i class="far fa-comment-dots"></i> Observações</label><textarea id="obs" class="form-control" placeholder="Ex: sabores e quantidades..."></textarea></div>
+            <div class="form-group"><label><i class="far fa-comment-dots"></i> Observações</label><textarea id="obs" class="form-control" placeholder="Deixe comentários e pedidos"></textarea></div>
             
             <div class="form-group"><label><i class="far fa-credit-card"></i> Pagamento</label>
                 <select id="payment" class="form-control" onchange="togglePix(this.value)">
@@ -528,7 +529,7 @@
         let deliveryFee = 0;
         let isPickup = false; 
 
-        // --- CARREGAMENTO DO CARDÁPIO (MANTIDO) ---
+        // --- CARREGAMENTO DO CARDÁPIO ---
         async function loadMenu() {
             const grid = document.getElementById('productsGrid');
             try {
@@ -604,13 +605,8 @@
             calculateTotal();
         }
 
-        // --- BUSCA INTELIGENTE COM AUTO-SELEÇÃO DE BAIRRO ---
-        function handleEnter(e) { 
-            if(e.key === 'Enter') {
-                e.preventDefault(); 
-                buscarEndereco(); 
-            }
-        }
+        // --- BUSCA INTELIGENTE ---
+        function handleEnter(e) { if(e.key === 'Enter') { e.preventDefault(); buscarEndereco(); } }
 
         async function buscarEndereco() {
             const query = document.getElementById('addressSearch').value.trim();
@@ -621,40 +617,28 @@
             list.innerHTML = '';
             resultDiv.innerHTML = "Buscando...";
 
-            // 1. TENTAR COMO CEP
             const cepClean = query.replace(/\D/g, '');
             if (cepClean.length === 8) {
                 try {
                     const respViaCep = await fetch(`https://viacep.com.br/ws/${cepClean}/json/`);
                     const dataViaCep = await respViaCep.json();
-                    
                     if (!dataViaCep.erro) {
                         const fullAddr = `${dataViaCep.logradouro}, ${dataViaCep.bairro}, Indaiatuba - SP`;
                         document.getElementById('addressSearch').value = fullAddr; 
                         resultDiv.innerHTML = "<span style='color:green'>Endereço encontrado! Verifique o bairro abaixo.</span>";
-                        
-                        // Tentar auto-selecionar bairro
                         trySelectNeighborhood(dataViaCep.bairro);
                         return;
                     }
                 } catch (e) { console.log("Erro ViaCEP, tentando texto..."); }
             }
 
-            // 2. BUSCA POR TEXTO
-            if(query.length < 3) {
-                resultDiv.innerHTML = "";
-                return alert("Digite o CEP ou nome da rua.");
-            }
+            if(query.length < 3) { resultDiv.innerHTML = ""; return alert("Digite o CEP ou nome da rua."); }
             
             try {
                 const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}, Indaiatuba, SP&addressdetails=1&limit=5`;
                 const response = await fetch(url);
                 const data = await response.json();
-
-                if(data.length === 0) {
-                    resultDiv.innerHTML = "<span style='color:red'>Não encontrado. Tente digitar apenas o nome da rua.</span>";
-                    return;
-                }
+                if(data.length === 0) { resultDiv.innerHTML = "<span style='color:red'>Não encontrado. Tente digitar apenas o nome da rua.</span>"; return; }
 
                 resultDiv.innerHTML = "Selecione o endereço correto:";
                 list.style.display = 'block';
@@ -663,11 +647,8 @@
                     const li = document.createElement('li');
                     let cleanName = place.display_name.split(',')[0]; 
                     if(place.address && place.address.road) cleanName = place.address.road;
-                    
-                    // Mostra bairro se tiver
                     const bairroApi = place.address.suburb || place.address.neighbourhood || place.address.residential || "";
                     if(bairroApi) cleanName += ` - ${bairroApi}`;
-                    
                     li.innerText = cleanName;
                     li.onclick = () => {
                         document.getElementById('addressSearch').value = cleanName;
@@ -677,22 +658,15 @@
                     };
                     list.appendChild(li);
                 });
-
-            } catch(e) {
-                console.error(e);
-                resultDiv.innerHTML = "<span style='color:red'>Erro de conexão.</span>";
-            }
+            } catch(e) { console.error(e); resultDiv.innerHTML = "<span style='color:red'>Erro de conexão.</span>"; }
         }
 
         function trySelectNeighborhood(bairroName) {
             if(!bairroName) return;
             const select = document.getElementById('neighborhoodSelect');
-            const search = bairroName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // remove acentos
-            
-            // Tenta encontrar match na lista
+            const search = bairroName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             for(let i=0; i<select.options.length; i++) {
                 const optText = select.options[i].text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                // Verifica se contém o nome
                 if(optText.includes(search) || search.includes(optText)) {
                     select.selectedIndex = i;
                     updateFeeFromNeighborhood();
@@ -700,38 +674,25 @@
                     return;
                 }
             }
-            // Se não achou, reseta para forçar seleção
             select.value = "";
             updateFeeFromNeighborhood();
         }
-
-        // --- LÓGICA DE FRETE ---
 
         function updateFeeFromNeighborhood() {
             const select = document.getElementById('neighborhoodSelect');
             const selectedOption = select.options[select.selectedIndex];
             const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
-            
             deliveryFee = price;
-            
             const display = document.getElementById('deliveryFeeDisplay');
-            if(deliveryFee > 0) {
-                display.innerText = "Taxa de entrega: R$ " + deliveryFee.toFixed(2).replace('.', ',');
-            } else {
-                display.innerText = "";
-            }
+            if(deliveryFee > 0) display.innerText = "Taxa de entrega: R$ " + deliveryFee.toFixed(2).replace('.', ',');
+            else display.innerText = "";
             calculateTotal();
         }
 
         function toggleDeliveryMode(mode) {
             isPickup = (mode === 'pickup');
             document.getElementById('addressSection').style.display = isPickup ? 'none' : 'block';
-            
-            if(isPickup) {
-                deliveryFee = 0;
-            } else {
-                updateFeeFromNeighborhood();
-            }
+            if(isPickup) deliveryFee = 0; else updateFeeFromNeighborhood();
             calculateTotal();
         }
 
@@ -741,11 +702,12 @@
             const extraBoxesCost = extraBoxesQty * 3.00;
             const fee = isPickup ? 0 : deliveryFee;
             const final = cartTotal + fee + extraBoxesCost;
-            
             document.getElementById('cartTotal').innerText = `R$ ${cartTotal.toFixed(2).replace('.',',')}`; 
             document.getElementById('finalTotal').innerText = `R$ ${final.toFixed(2).replace('.',',')}`; 
             return { cartTotal, fee, extraBoxesCost, final };
         }
+
+        // --- FUNÇÕES DE CHECKOUT ---
 
         function renderSodaOptions() {
             const wrapper = document.getElementById('sodaOptionsWrapper');
@@ -755,46 +717,98 @@
             cart.forEach((item, index) => {
                 let options = [];
                 const name = item.name.toLowerCase();
+                
+                // Ignora Monte seu Combo (pois ele tem a tabela de escolha de sabores)
+                // Se quiser liberar refri pra ele, remova a linha abaixo.
+                if (name.includes('monte')) return;
 
-                // --- CORREÇÃO AQUI: TRAVA DE SEGURANÇA ---
-                // Se o nome do produto tiver a palavra "monte", o sistema IGNORA 
-                // e não oferece bebida grátis, mesmo que tenha números como "40" ou "20".
-                if (name.includes('monte')) {
-                    return; // Pula para o próximo item do carrinho
-                }
-
-                // Lógica dos Combos com Bebida Grátis
-                // Só entra aqui se NÃO tiver "monte" no nome
-                if (name.includes('combo 0') || name.includes('combo 2')) { 
+                // LÓGICA ATUALIZADA PARA COBRIR COMBOS DE 0 A 8
+                if (name.includes('combo 0') || name.includes('combo 1') || name.includes('combo 2') || name.includes('combo 3')) {
                     options = ['Coca-Cola (Lata 350ml)', 'Guaraná (Lata 350ml)']; 
                 } 
-                else if (name.includes('combo 4') || name.includes('combo 6')) { 
+                else if (name.includes('combo 4') || name.includes('combo 5') || name.includes('combo 6')) {
                     options = ['Coca-Cola (1 Litro)', 'Guaraná (1.5 Litros)']; 
                 } 
-                else if (name.includes('combo 7')) { 
+                else if (name.includes('combo 7') || name.includes('combo 8')) {
                     options = ['Coca-Cola (2 Litros)', 'Guaraná (2 Litros)']; 
                 }
 
-                // Se encontrou alguma opção de bebida, monta o HTML
                 if (options.length > 0) {
                     hasSoda = true;
                     let optionsHtml = options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
-                    
-                    wrapper.innerHTML += `
-                        <div style="margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px;">
-                            <label style="font-size: 0.9rem; font-weight:bold; color:var(--primary-dark); display:block; margin-bottom:5px;">
-                                <i class="fas fa-wine-bottle"></i> Bebida para: ${item.name}
-                            </label>
-                            <select class="form-control soda-select" data-item-index="${index}" style="margin-bottom:0; padding:10px;">
-                                ${optionsHtml}
-                            </select>
-                        </div>`;
+                    wrapper.innerHTML += `<div style="margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px;"><label style="font-size: 0.9rem; font-weight:bold; color:var(--primary-dark); display:block; margin-bottom:5px;"><i class="fas fa-wine-bottle"></i> Bebida para: ${item.name}</label><select class="form-control soda-select" data-item-index="${index}" style="margin-bottom:0; padding:10px;">${optionsHtml}</select></div>`;
                 }
             });
 
-            // Se tiver pelo menos uma bebida, adiciona o título da seção
-            if (hasSoda) {
-                wrapper.innerHTML = `<div class="prefs-title" style="margin-top:0;"><i class="fas fa-glass-cheers"></i> Escolha as Bebidas</div>` + wrapper.innerHTML;
+            if (hasSoda) wrapper.innerHTML = `<div class="prefs-title" style="margin-top:0;"><i class="fas fa-glass-cheers"></i> Escolha as Bebidas</div>` + wrapper.innerHTML;
+        }
+
+        // --- FUNÇÃO: MONTAR OPÇÕES DO COMBO (TABELA) ---
+        function renderComboOptions() {
+            const wrapper = document.getElementById('comboOptionsWrapper');
+            wrapper.innerHTML = '';
+            let hasCombo = false;
+
+            const flavors = [
+                "Coxinhas de frango", "Bolinhas de queijo", "Risoles de presunto e queijo",
+                "Risoles de calabresa com queijo", "Enroladinhos de salsicha",
+                "Croquetes de carne", "Croquetes de calabresa",
+                "Churros Doce de Leite", "Churros Chocolate"
+            ];
+
+            cart.forEach((item, index) => {
+                const name = item.name.toLowerCase();
+                if (name.includes('monte')) {
+                    hasCombo = true;
+                    let limit = 0;
+                    const numbers = item.name.match(/\d+/);
+                    if (numbers) limit = parseInt(numbers[0]);
+                    
+                    const limitText = limit > 0 ? `(Total: <span id="count-curr-${index}" style="font-weight:bold">0</span> / ${limit})` : '(Escolha à vontade)';
+
+                    let html = `
+                    <div style="background: white; border: 2px dashed var(--primary); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <div style="font-weight:800; color:var(--dark); margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
+                            <i class="fas fa-tasks"></i> ${item.name} <br>
+                            <small style="color:var(--primary-dark); font-size: 0.85rem;">${limitText}</small>
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse;">`;
+
+                    flavors.forEach(flavor => {
+                        html += `
+                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                            <td style="padding: 8px 0; font-size: 0.9rem; color: #333;">${flavor}</td>
+                            <td style="padding: 8px 0; text-align: right; width: 80px;">
+                                <input type="number" class="combo-input-${index}" data-name="${flavor}" 
+                                       min="0" max="${limit || 100}" value="0" 
+                                       style="width: 60px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-weight: bold; font-size: 1rem;" 
+                                       onchange="validateCombo(${index}, ${limit})" oninput="validateCombo(${index}, ${limit})">
+                            </td>
+                        </tr>`;
+                    });
+
+                    html += `</table></div>`;
+                    wrapper.innerHTML += html;
+                }
+            });
+
+            if (hasCombo) {
+                wrapper.innerHTML = `<div class="prefs-title" style="margin-top:0;"><i class="fas fa-layer-group"></i> Monte seus Combos</div>` + wrapper.innerHTML;
+            }
+        }
+
+        function validateCombo(index, limit) {
+            if (limit === 0) return;
+            const inputs = document.querySelectorAll(`.combo-input-${index}`);
+            let total = 0;
+            inputs.forEach(inp => total += (parseInt(inp.value) || 0));
+            
+            const countDisplay = document.getElementById(`count-curr-${index}`);
+            if(countDisplay) {
+                countDisplay.innerText = total;
+                if (total > limit) { countDisplay.style.color = 'red'; countDisplay.innerText += " (Excedeu!)"; } 
+                else if (total === limit) { countDisplay.style.color = 'green'; countDisplay.innerText += " (OK)"; } 
+                else { countDisplay.style.color = 'var(--dark)'; }
             }
         }
 
@@ -802,70 +816,45 @@
             if(cart.length === 0) return alert('Carrinho vazio!');
             toggleCart(false);
             renderSodaOptions();
+            renderComboOptions(); 
             document.getElementById('checkoutModal').style.display = 'flex';
             calculateTotal();
         }
 
         function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
         function togglePix(val) { document.getElementById('pixArea').style.display = val === 'PIX' ? 'block' : 'none'; }
+        
         function sendOrder() {
-            // --- VALIDAÇÃO DE HORÁRIO ATUALIZADA (PEDIDO DO IRMÃO) ---
             const now = new Date();
-            const currentDay = now.getDay(); // 0 = Domingo, 1 = Segunda...
+            const currentDay = now.getDay(); 
             const currentHour = now.getHours();
             
             const schedDateVal = document.getElementById('scheduleDate').value;
             const schedTimeVal = document.getElementById('scheduleTime').value;
             const hasSchedule = (schedDateVal !== "");
             
-            // 1. REGRAS PARA QUEM ESTÁ AGENDANDO
             if (hasSchedule) {
                 if (!schedTimeVal) { alert("⏰ Por favor, preencha o HORÁRIO do agendamento."); return; }
-                
                 const parts = schedDateVal.split('-'); 
-                // Cria data baseada no input (Mês no JS começa em 0)
                 const scheduledDateObj = new Date(parts[0], parts[1] - 1, parts[2]);
                 const scheduledDay = scheduledDateObj.getDay();
                 const scheduledHour = parseInt(schedTimeVal.split(':')[0]); 
 
-                // Valida Terça-feira (Fechado)
                 if (scheduledDay === 2) { alert("📅 DATA INDISPONÍVEL!\n\nA loja não abre às terças-feiras."); return; }
-                
-                // Valida Domingo (Limite até 18h)
                 if (scheduledDay === 0 && scheduledHour >= 18) { alert("📅 DOMINGO FECHAMOS MAIS CEDO!\n\nAos domingos recebemos pedidos apenas até as 18h."); return; }
-
-                // Valida Limites Gerais de funcionamento (7h às 22h)
                 if (scheduledHour < 7 || scheduledHour >= 22) { alert("⏰ HORÁRIO INDISPONÍVEL!\n\nEntregas das 07h às 22h."); return; }
             }
 
-            // 2. REGRAS PARA PEDIDO "AGORA" (SEM AGENDAMENTO)
             if (!hasSchedule) {
-                // Fechado Terça-feira
                 if (currentDay === 2) { alert("🛑 A LOJA ESTÁ FECHADA HOJE (TERÇA-FEIRA)!"); return; }
-
-                // Regra do Domingo: Bloqueia depois das 18h
-                if (currentDay === 0 && currentHour >= 18) { 
-                    alert("🛑 A LOJA JÁ FECHOU!\n\nAos domingos funcionamos somente até às 18h."); 
-                    return; 
-                }
-
-                // Regra da Manhã (A "pegadinha" do 7h as 9h)
+                if (currentDay === 0 && currentHour >= 18) { alert("🛑 A LOJA JÁ FECHOU!\n\nAos domingos funcionamos somente até às 18h."); return; }
                 if (currentHour < 9) {
-                    if (currentHour >= 7) {
-                        // Entre 7h e 9h: Pode, mas só agendando
-                        alert("⚠️ AVISO MATINAL\n\nEntre 07h e 09h, atendemos somente com AGENDAMENTO.\n\nPor favor, selecione uma data e horário no campo 'Agendar' mais abaixo.");
-                    } else {
-                        // Antes das 7h: Fechado total
-                        alert("💤 A LOJA ESTÁ FECHADA AGORA!\n\nAtendimento normal a partir das 09h (ou agendado a partir das 07h).");
-                    }
+                    if (currentHour >= 7) alert("⚠️ AVISO MATINAL\n\nEntre 07h e 09h, atendemos somente com AGENDAMENTO.\n\nPor favor, selecione uma data e horário no campo 'Agendar' mais abaixo.");
+                    else alert("💤 A LOJA ESTÁ FECHADA AGORA!\n\nAtendimento normal a partir das 09h (ou agendado a partir das 07h).");
                     return;
                 }
-
-                // Regra da Noite (Depois das 22h) - exceto domingo que já barramos acima
                 if (currentHour >= 22) { alert("💤 A LOJA ESTÁ FECHADA AGORA!\n\nEncerramos às 22h."); return; }
             }
-
-            // --- FIM DA VALIDAÇÃO, INÍCIO DA MONTAGEM DO PEDIDO ---
 
             const name = document.getElementById('name').value;
             const payment = document.getElementById('payment').value;
@@ -876,129 +865,84 @@
             const neighborhood = document.getElementById('neighborhoodSelect').value;
 
             if(!name || !payment) return alert("Preencha Nome e Pagamento.");
-            
-            // VALIDAÇÃO OBRIGATÓRIA DE BAIRRO
-            if(!isPickup && !neighborhood) {
-                return alert("⚠️ Por favor, SELECIONE O BAIRRO na lista para calcularmos a entrega.");
-            }
+            if(!isPickup && !neighborhood) return alert("⚠️ Por favor, SELECIONE O BAIRRO na lista para calcularmos a entrega.");
 
             const { cartTotal, fee, extraBoxesCost, final } = calculateTotal();
-            
-            // Mensagem de tempo dinâmica
-            const timeMessage = isPickup 
-                ? "🕒 Tempo estimado para retirada: 35 a 30 minutos." 
-                : "🕒 Tempo estimado de entrega: 35 a 55 minutos.";
-
-            let addressTxt = "";
-            if (isPickup) {
-                addressTxt = "📍 *VOU RETIRAR NA LOJA*";
-            } else {
-                const street = document.getElementById('addressSearch').value;
-                const number = document.getElementById('number').value;
-                addressTxt = `🛵 *ENTREGAR EM:*\nBairro: ${neighborhood}\n${street}, Nº ${number}`;
-            }
-
+            const timeMessage = isPickup ? "🕒 Tempo estimado para retirada: 35 a 30 minutos." : "🕒 Tempo estimado de entrega: 35 a 55 minutos.";
+            let addressTxt = isPickup ? "📍 *VOU RETIRAR NA LOJA*" : `🛵 *ENTREGAR EM:*\nBairro: ${neighborhood}\n${document.getElementById('addressSearch').value}, Nº ${document.getElementById('number').value}`;
             let agendamentoTxt = schedDateVal && schedTimeVal ? `\n📅 *AGENDADO:* ${schedDateVal.split('-').reverse().join('/')} às ${schedTimeVal}` : `\n🚀 *PARA AGORA*`;
             
             const sodaSelects = document.querySelectorAll('.soda-select');
             let sodaChoices = {};
-            sodaSelects.forEach(select => {
-                const index = select.getAttribute('data-item-index');
-                sodaChoices[index] = select.value;
-            });
+            sodaSelects.forEach(select => { sodaChoices[select.getAttribute('data-item-index')] = select.value; });
 
             let msg = `*NOVO PEDIDO MK*\n${agendamentoTxt}\n\n📋 *ITENS:*\n`;
             
             cart.forEach((item, index) => { 
                 msg += `▪️ 1x ${item.name}\n`; 
                 if(sodaChoices[index]) { msg += `   ↳ 🥤 ${sodaChoices[index]}\n`; }
+                
+                const comboInputs = document.querySelectorAll(`.combo-input-${index}`);
+                let comboDetails = [];
+                comboInputs.forEach(input => {
+                    const qty = parseInt(input.value);
+                    if(qty > 0) comboDetails.push(`${qty}x ${input.getAttribute('data-name')}`);
+                });
+                if(comboDetails.length > 0) msg += `   ↳ 🥟 *Montagem:* ${comboDetails.join(', ')}\n`;
             });
 
             if(parseInt(extraBoxesQty) > 0) msg += `▪️ ${extraBoxesQty}x Caixas Extras (+R$ ${extraBoxesCost.toFixed(2)})\n`;
-
             msg += `\n📦 Subtotal: R$ ${cartTotal.toFixed(2)}\n`;
-            if(isPickup) msg += `🛑 *RETIRADA (Grátis)*\n`;
-            else msg += `🛵 Entrega: R$ ${fee.toFixed(2)}\n`;
-            
+            if(isPickup) msg += `🛑 *RETIRADA (Grátis)*\n`; else msg += `🛵 Entrega: R$ ${fee.toFixed(2)}\n`;
             msg += `✅ *TOTAL FINAL: R$ ${final.toFixed(2)}*\n\n👤 *Cliente:* ${name}\n${addressTxt}\n💰 *Pagamento:* ${payment}\n\n📝 *PREFERÊNCIAS:*\nSachês: ${saches || 'Nenhum'}\nSabor Churros: ${churros || '-'}\nObs: ${obs}\n\n${timeMessage}`;
             
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
         }
              
-        
         function generateReceipt() {
             const date = new Date().toLocaleString('pt-BR');
             const { cartTotal, fee, extraBoxesCost, final } = calculateTotal();
             const extraBoxesQty = document.getElementById('extraBoxes').value;
-            // Coleta os sachês marcados
             const saches = Array.from(document.querySelectorAll('.sache-opt:checked')).map(cb => cb.value).join(', ');
             const churros = document.getElementById('churrosFlavor').value;
 
-            // Coleta as bebidas selecionadas (se houver alguma)
             const sodaSelects = document.querySelectorAll('.soda-select');
             let sodaChoices = {};
-            sodaSelects.forEach(select => {
-                const index = select.getAttribute('data-item-index');
-                sodaChoices[index] = select.value;
-            });
+            sodaSelects.forEach(select => { sodaChoices[select.getAttribute('data-item-index')] = select.value; });
 
-            // Monta a lista de itens com visual corrigido (Flexbox)
-            let itemsHtml = ''; 
+            let itemsHtml = '<table style="width:100%; border-collapse: collapse; margin-bottom: 10px;">';
+            
             cart.forEach((item, index) => { 
-                itemsHtml += `
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; border-bottom: 1px dotted #ddd; padding-bottom: 2px;">
-                    <div style="padding-right: 10px; width: 70%;">1x ${item.name}</div>
-                    <div style="font-weight: bold; white-space: nowrap;">R$ ${item.price.toFixed(2).replace('.', ',')}</div>
-                </div>`; 
+                itemsHtml += `<tr><td style="padding: 4px 0; text-align:left; width: 75%; vertical-align: top;">1x ${item.name}</td><td style="padding: 4px 0; text-align:right; white-space: nowrap; font-weight: bold;">R$ ${item.price.toFixed(2).replace('.', ',')}</td></tr>`;
                 
-                // Só adiciona a linha de bebida se realmente tiver uma escolhida
-                if(sodaChoices[index]) { 
-                    itemsHtml += `<div style="margin-bottom:5px; font-size:0.8rem; color:#666; margin-top: -3px;"> ↳ Bebida: ${sodaChoices[index]}</div>`; 
+                if(sodaChoices[index]) itemsHtml += `<tr><td colspan="2" style="padding-bottom: 4px; font-size: 0.8rem; color: #666; font-style: italic;"> ↳ Bebida: ${sodaChoices[index]}</td></tr>`; 
+
+                const comboInputs = document.querySelectorAll(`.combo-input-${index}`);
+                let comboDetails = [];
+                comboInputs.forEach(input => {
+                    const qty = parseInt(input.value);
+                    if(qty > 0) comboDetails.push(`${qty}x ${input.getAttribute('data-name')}`);
+                });
+                if(comboDetails.length > 0) {
+                    itemsHtml += `<tr><td colspan="2" style="padding-bottom: 8px; font-size: 0.8rem; color: #444; border-bottom: 1px dashed #ccc;"> ↳ Sabores: ${comboDetails.join(', ')}</td></tr>`;
+                } else {
+                     itemsHtml += `<tr><td colspan="2" style="border-bottom: 1px dotted #eee;"></td></tr>`;
                 }
             });
-            
-            let extrasHtml = parseInt(extraBoxesQty) > 0 ? `<div style="display: flex; justify-content: space-between;"><span>+ ${extraBoxesQty}x Caixas Extras</span> <span>R$ ${extraBoxesCost.toFixed(2).replace('.', ',')}</span></div>` : '';
-            
-            // Mensagem de tempo
-            const timeMessage = isPickup 
-                ? "🕒 Tempo estimado para retirada: 35 a 30 minutos." 
-                : "🕒 Tempo estimado de entrega: 35 a 55 minutos.";
 
-            const html = `
-                <div style="text-align:center; font-weight:bold; font-size: 1.1rem; margin-bottom: 5px;">MK SALGADOS</div>
-                <div style="text-align:center; font-size:0.8rem; margin-bottom:15px; color:#555;">${date}</div>
-                
-                <div style="margin-bottom: 15px;">
-                    ${itemsHtml}
-                    ${extrasHtml}
-                </div>
-                
-                <div style="background: #eee; padding: 10px; border-radius: 5px; font-size: 0.9rem;">
-                    <div style="display:flex; justify-content:space-between;"><span>Subtotal:</span> <span>R$ ${cartTotal.toFixed(2).replace('.', ',')}</span></div>
-                    <div style="display:flex; justify-content:space-between;"><span>${isPickup ? 'Retirada:' : 'Taxa de Entrega:'}</span> <span>${isPickup ? 'Grátis' : 'R$ ' + fee.toFixed(2).replace('.', ',')}</span></div>
-                    <div style="display:flex; justify-content:space-between; margin-top: 5px; font-weight: 900; font-size: 1.1rem; color: var(--dark);"><span>TOTAL:</span> <span>R$ ${final.toFixed(2).replace('.', ',')}</span></div>
-                </div>
+            if(parseInt(extraBoxesQty) > 0) itemsHtml += `<tr><td style="padding: 8px 0;">+ ${extraBoxesQty}x Caixas Extras</td><td style="text-align:right;">R$ ${extraBoxesCost.toFixed(2).replace('.', ',')}</td></tr>`;
+            itemsHtml += '</table>';
+            
+            const timeMessage = isPickup ? "🕒 Retirada: 30-35 min" : "🕒 Entrega: 35-55 min";
 
-                <div style="margin-top:15px; font-size:0.85rem; border-top:1px dashed #ccc; padding-top:10px;">
-                    <b>Preferências:</b><br>
-                    Sachês: ${saches || 'Nenhum'}<br>
-                    Churros: ${churros || '-'}<br>
-                </div>
-                
-                <div style="margin-top:20px; padding-top:10px; border-top: 2px solid #333; text-align:center; font-weight:bold; font-size:0.9rem;">
-                    ${timeMessage}<br>
-                    <span style="font-weight:normal; font-size:0.8rem;">Agradecemos a preferência!</span>
-                </div>
-            `;
+            const html = `<div style="text-align:center; font-weight:900; font-size: 1.2rem; margin-bottom: 5px;">MK SALGADOS</div><div style="text-align:center; font-size:0.8rem; margin-bottom:15px; color:#555;">${date}</div>${itemsHtml}<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-size: 0.9rem; border: 1px solid #eee;"><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Subtotal:</span> <span>R$ ${cartTotal.toFixed(2).replace('.', ',')}</span></div><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${isPickup ? 'Retirada:' : 'Taxa de Entrega:'}</span> <span>${isPickup ? 'Grátis' : 'R$ ' + fee.toFixed(2).replace('.', ',')}</span></div><div style="display:flex; justify-content:space-between; margin-top: 10px; font-weight: 900; font-size: 1.3rem; color: var(--dark); border-top: 1px solid #ddd; padding-top: 10px;"><span>TOTAL:</span> <span>R$ ${final.toFixed(2).replace('.', ',')}</span></div></div><div style="margin-top:15px; font-size:0.85rem; padding: 10px; background: #fffbe6; border-radius: 5px;"><b>Preferências:</b><br>Sachês: ${saches || 'Nenhum'}<br>Churros: ${churros || '-'}<br></div><div style="margin-top:20px; text-align:center; font-weight:bold; font-size:0.9rem; color: #555;">${timeMessage}<br>Obrigado pela preferência!</div>`;
             
             const previewDiv = document.getElementById('receiptPreview');
             previewDiv.innerHTML = html;
             previewDiv.style.display = 'block';
-
             previewDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         window.onload = loadMenu;
     </script>
 </body>
 </html>
-
