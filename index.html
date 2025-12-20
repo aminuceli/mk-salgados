@@ -250,10 +250,10 @@
             <div id="addressSection">
                 
                 <div class="form-group">
-                    <label><i class="fas fa-map-marker-alt"></i> Digite o CEP ou nome da rua e clique na lupa:</label>
+                    <label><i class="fas fa-map-marker-alt"></i> Digite o CEP (apenas números) OU Nome da Rua:</label>
                     <div style="font-size: 0.85rem; color:#666; margin-bottom:5px;"></div>
                     <div class="input-row">
-                        <input type="text" id="addressSearch" class="form-control" placeholder="Ex: 13348-270 ou Rua dos Indaiás" onkeypress="handleEnter(event)">
+                        <input type="text" id="addressSearch" class="form-control" placeholder="Ex: 13348270 ou Rua dos Indaiás" onkeypress="handleEnter(event)">
                         <button class="btn-search" onclick="buscarEndereco()"><i class="fas fa-search"></i></button>
                     </div>
                     <ul class="address-list" id="addressList"></ul>
@@ -607,7 +607,7 @@
             calculateTotal();
         }
 
-        // --- BUSCA INTELIGENTE ---
+        // --- BUSCA INTELIGENTE (CORRIGIDA) ---
         function handleEnter(e) { if(e.key === 'Enter') { e.preventDefault(); buscarEndereco(); } }
 
         async function buscarEndereco() {
@@ -619,28 +619,48 @@
             list.innerHTML = '';
             resultDiv.innerHTML = "Buscando...";
 
+            // Lógica de CEP (Prioridade e Isolamento)
             const cepClean = query.replace(/\D/g, '');
+            
             if (cepClean.length === 8) {
+                // SE TEM 8 DIGITOS, É TRATADO EXCLUSIVAMENTE COMO CEP
                 try {
                     const respViaCep = await fetch(`https://viacep.com.br/ws/${cepClean}/json/`);
                     const dataViaCep = await respViaCep.json();
+                    
                     if (!dataViaCep.erro) {
                         const fullAddr = `${dataViaCep.logradouro}, ${dataViaCep.bairro}, Indaiatuba - SP`;
                         document.getElementById('addressSearch').value = fullAddr; 
-                        resultDiv.innerHTML = "<span style='color:green'>Endereço encontrado! Verifique o bairro abaixo.</span>";
+                        resultDiv.innerHTML = "<span style='color:green'>Endereço encontrado via CEP!</span>";
                         trySelectNeighborhood(dataViaCep.bairro);
-                        return;
+                        return; // SUCESSO DO CEP - PARA AQUI
+                    } else {
+                        resultDiv.innerHTML = "<span style='color:red'>CEP não encontrado. Por favor, digite o nome da rua.</span>";
+                        return; // FALHA DO CEP - PARA AQUI (Não tenta mapa para evitar rodovia)
                     }
-                } catch (e) { console.log("Erro ViaCEP, tentando texto..."); }
+                } catch (e) { 
+                    console.log("Erro ViaCEP");
+                    resultDiv.innerHTML = "<span style='color:red'>Erro ao buscar CEP. Verifique a conexão.</span>";
+                    return;
+                }
             }
 
-            if(query.length < 3) { resultDiv.innerHTML = ""; return alert("Digite o CEP ou nome da rua."); }
+            // Se chegou aqui, não é um CEP válido (tem letras ou numero errado de digitos)
+            // Então faz busca por NOME DE RUA no OpenStreetMap
+            if(query.length < 3) { 
+                resultDiv.innerHTML = ""; 
+                return alert("Digite o CEP (8 números) ou o nome da rua."); 
+            }
             
             try {
                 const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}, Indaiatuba, SP&addressdetails=1&limit=5`;
                 const response = await fetch(url);
                 const data = await response.json();
-                if(data.length === 0) { resultDiv.innerHTML = "<span style='color:red'>Não encontrado. Tente digitar apenas o nome da rua.</span>"; return; }
+                
+                if(data.length === 0) { 
+                    resultDiv.innerHTML = "<span style='color:red'>Rua não encontrada. Tente digitar o CEP.</span>"; 
+                    return; 
+                }
 
                 resultDiv.innerHTML = "Selecione o endereço correto:";
                 list.style.display = 'block';
@@ -660,7 +680,7 @@
                     };
                     list.appendChild(li);
                 });
-            } catch(e) { console.error(e); resultDiv.innerHTML = "<span style='color:red'>Erro de conexão.</span>"; }
+            } catch(e) { console.error(e); resultDiv.innerHTML = "<span style='color:red'>Erro de conexão com o mapa.</span>"; }
         }
 
         function trySelectNeighborhood(bairroName) {
@@ -723,7 +743,7 @@
                 // Ignora Monte seu Combo (pois ele tem a tabela de escolha de sabores)
                 if (name.includes('monte')) return;
 
-                // LÓGICA ATUALIZADA PARA COBRIR COMBOS DE 0 A 8
+                // LÓGICA DE REFRI (0 a 8)
                 if (name.includes('combo 0') || name.includes('combo 1') || name.includes('combo 2') || name.includes('combo 3')) {
                     options = ['Coca-Cola (Lata 350ml)', 'Guaraná (Lata 350ml)']; 
                 } 
