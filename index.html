@@ -902,10 +902,19 @@
         function sendOrder() {
 
             if (!isPickup && !enderecoConfirmado) {
-                alert("⚠️ digite o CEP ou rua e clique na lupa para buscar o endereço.");
+                alert("⚠️ Digite o CEP ou rua e clique na lupa para buscar o endereço.");
                 document.getElementById('addressSearch').focus();
                 return;
             }
+            if (!isPickup) {
+                const numero = document.getElementById('number').value.trim();
+                if (numero === "") {
+                    alert("⚠️ Por favor, informe o número da casa.");
+                    document.getElementById('number').focus();
+                    return;
+                }
+            }
+            
             const now = new Date();
             const currentDay = now.getDay(); 
             const currentHour = now.getHours();
@@ -1027,4 +1036,5 @@
     </script>
 </body>
 </html>
+
 
