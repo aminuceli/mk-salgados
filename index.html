@@ -251,7 +251,9 @@
                 
                 <div class="form-group">
                     <label><i class="fas fa-map-marker-alt"></i> Digite o CEP (apenas números) OU Nome da Rua:</label>
-                    <div style="font-size: 0.85rem; color:#666; margin-bottom:5px;"></div>
+                    <div style="font-size: 0.85rem; color:#666; margin-bottom:5px;">
+                    👉 Após digitar, <b>clique na lupa</b> para buscar o endereço
+                    </div>                    
                     <div class="input-row">
                         <input type="text" id="addressSearch" class="form-control" placeholder="Ex: 13348270 ou Rua dos Indaiás" onkeypress="handleEnter(event)">
                         <button class="btn-search" onclick="buscarEndereco()"><i class="fas fa-search"></i></button>
@@ -530,6 +532,8 @@
         let cart = [];
         let deliveryFee = 0;
         let isPickup = false; 
+        let enderecoConfirmado = false;
+
 
         // --- CARREGAMENTO DO CARDÁPIO ---
         async function loadMenu() {
@@ -639,6 +643,8 @@
                         const fullAddr = `${data.logradouro}, ${data.bairro}, Indaiatuba - SP`;
                         document.getElementById('addressSearch').value = fullAddr; 
                         resultDiv.innerHTML = "<span style='color:green'>Endereço encontrado!</span>";
+                        enderecoConfirmado = true;
+
                         trySelectNeighborhood(data.bairro);
                         return;
                     } else {
@@ -687,6 +693,7 @@
                         document.getElementById('addressSearch').value = cleanName;
                         list.style.display = 'none';
                         resultDiv.innerHTML = "";
+                        enderecoConfirmado = true;
                         trySelectNeighborhood(bairroApi);
                     };
                     list.appendChild(li);
@@ -778,7 +785,7 @@
                 if (name.includes('monte')) return;
 
                 // LÓGICA DE REFRI (0 a 8)
-                if (name.includes('combo 0') || name.includes('combo 1') || name.includes('combo 2') || name.includes('combo 3')) {
+                if (name.includes('combinho') || name.includes('combo 1') || name.includes('combo 2') || name.includes('combo 3')) {
                     options = ['Coca-Cola (Lata 350ml)', 'Guaraná (Lata 350ml)']; 
                 } 
                 else if (name.includes('combo 4') || name.includes('combo 5') || name.includes('combo 6')) {
@@ -893,6 +900,12 @@
         function togglePix(val) { document.getElementById('pixArea').style.display = val === 'PIX' ? 'block' : 'none'; }
         
         function sendOrder() {
+
+            if (!isPickup && !enderecoConfirmado) {
+                alert("⚠️ digite o CEP ou rua e clique na lupa para buscar o endereço.");
+                document.getElementById('addressSearch').focus();
+                return;
+            }
             const now = new Date();
             const currentDay = now.getDay(); 
             const currentHour = now.getHours();
@@ -1014,3 +1027,4 @@
     </script>
 </body>
 </html>
+
