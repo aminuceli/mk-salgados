@@ -930,19 +930,13 @@
                 const scheduledDay = scheduledDateObj.getDay();
                 const scheduledHour = parseInt(schedTimeVal.split(':')[0]); 
 
-                if (scheduledDay === 2) { alert("📅 DATA INDISPONÍVEL!\n\nA loja não abre às terças-feiras."); return; }
-                if (scheduledDay === 0 && scheduledHour >= 18) { alert("📅 DOMINGO FECHAMOS MAIS CEDO!\n\nAos domingos recebemos pedidos apenas até as 18h."); return; }
-                if (scheduledHour < 7 || scheduledHour >= 22) { alert("⏰ HORÁRIO INDISPONÍVEL!\n\nEntregas das 07h às 22h."); return; }
+                if (scheduledDay === 0) { alert("📅 DATA INDISPONÍVEL!\n\nA loja não abre aos domingos."); return; }
+                if (scheduledHour < 9 || scheduledHour >= 22) { alert("⏰ HORÁRIO INDISPONÍVEL!\n\nAtendimento das 09h às 22h."); return; }
             }
 
             if (!hasSchedule) {
-                if (currentDay === 2) { alert("🛑 A LOJA ESTÁ FECHADA HOJE (TERÇA-FEIRA)!"); return; }
-                if (currentDay === 0 && currentHour >= 18) { alert("🛑 A LOJA JÁ FECHOU!\n\nAos domingos funcionamos somente até às 18h."); return; }
-                if (currentHour < 9) {
-                    if (currentHour >= 7) alert("⚠️ AVISO MATINAL\n\nEntre 07h e 09h, atendemos somente com AGENDAMENTO.\n\nPor favor, selecione uma data e horário no campo 'Agendar' mais abaixo.");
-                    else alert("💤 A LOJA ESTÁ FECHADA AGORA!\n\nAtendimento normal a partir das 09h (ou agendado a partir das 07h).");
-                    return;
-                }
+                if (currentDay === 0) { alert("🛑 A LOJA ESTÁ FECHADA HOJE (DOMINGO)!"); return; }
+                if (currentHour < 9) { alert("💤 A LOJA ESTÁ FECHADA AGORA!\n\nAtendimento a partir das 09h."); return; }
                 if (currentHour >= 22) { alert("💤 A LOJA ESTÁ FECHADA AGORA!\n\nEncerramos às 22h."); return; }
             }
 
@@ -1036,6 +1030,7 @@
     </script>
 </body>
 </html>
+
 
 
 
