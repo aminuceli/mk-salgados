@@ -931,12 +931,19 @@
                 const scheduledHour = parseInt(schedTimeVal.split(':')[0]); 
 
                 if (scheduledDay === 0) { alert("📅 DATA INDISPONÍVEL!\n\nA loja não abre aos domingos."); return; }
-                if (scheduledHour < 9 || scheduledHour >= 22) { alert("⏰ HORÁRIO INDISPONÍVEL!\n\nAtendimento das 09h às 22h."); return; }
+                if (scheduledHour < 7 || scheduledHour >= 22) { alert("⏰ HORÁRIO INDISPONÍVEL!\n\nEntregas agendadas ocorrem das 07h às 22h."); return; }
             }
 
             if (!hasSchedule) {
                 if (currentDay === 0) { alert("🛑 A LOJA ESTÁ FECHADA HOJE (DOMINGO)!"); return; }
-                if (currentHour < 9) { alert("💤 A LOJA ESTÁ FECHADA AGORA!\n\nAtendimento a partir das 09h."); return; }
+                
+                // Mensagem de alerta se tentar pedir para "agora" entre 7h e 8h59
+                if (currentHour >= 7 && currentHour < 9) { 
+                    alert("⏰ ATENÇÃO!\n\nDas 07h às 09h entregamos APENAS pedidos agendados.\n\nPor favor, preencha a data e o horário de agendamento logo acima."); 
+                    return; 
+                }
+                
+                if (currentHour < 7) { alert("💤 A LOJA ESTÁ FECHADA AGORA!\n\nAtendimento normal a partir das 09h (entregas agendadas a partir das 07h)."); return; }
                 if (currentHour >= 22) { alert("💤 A LOJA ESTÁ FECHADA AGORA!\n\nEncerramos às 22h."); return; }
             }
 
@@ -1030,6 +1037,7 @@
     </script>
 </body>
 </html>
+
 
 
 
